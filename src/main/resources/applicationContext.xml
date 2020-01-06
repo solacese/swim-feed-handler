@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:int="http://www.springframework.org/schema/integration"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		https://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <context:annotation-config />
+    <!--<context:component-scan base-package="com.solace.swim" /> -->
+
+    <beans:bean id="envProducer" class="java.util.Hashtable">
+        <beans:constructor-arg>
+            <beans:map key-type="java.lang.Object" value-type="java.lang.String">
+                <beans:entry key="java.naming.factory.initial" value="com.solacesystems.jndi.SolJNDIInitialContextFactory"/>
+                <beans:entry key="java.naming.provider.url" value="${service.solace-publishing.jms.host}"/>
+                <beans:entry key="Solace_JMS_VPN" value="${service.solace-publishing.jms.msgVpn}"/>
+                <beans:entry key="java.naming.security.principal" value="${service.solace-publishing.jms.clientUsername}"/>
+                <beans:entry key="java.naming.security.credentials" value="${service.solace-publishing.jms.clientPassword}"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <beans:bean id="envConsumer" class="java.util.Hashtable">
+        <beans:constructor-arg>
+            <beans:map key-type="java.lang.Object" value-type="java.lang.String">
+                <beans:entry key="java.naming.factory.initial" value="com.solacesystems.jndi.SolJNDIInitialContextFactory"/>
+                <beans:entry key="java.naming.provider.url" value="${solace.jms.consumer.host}"/>
+                <beans:entry key="Solace_JMS_VPN" value="${solace.jms.consumer.msgVpn}"/>
+                <beans:entry key="java.naming.security.principal" value="${solace.jms.consumer.clientUsername}"/>
+                <beans:entry key="java.naming.security.credentials" value="${solace.jms.consumer.clientPassword}"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+
+    <int:gateway id="msgConsumerGateway"
+                 service-interface="com.solace.swim.config.ISCDSConsumer"
+                 default-request-channel="msg.scds.service" />
+
+    <int:channel id="msg.dlq">
+        <int:queue capacity="1"/>
+    </int:channel>
+
+    <int:publish-subscribe-channel id="msg.scds.service" task-executor="taskExecutor"/>
+
+    <beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <beans:property name="corePoolSize" value="2" />
+        <beans:property name="maxPoolSize" value="20" />
+        <beans:property name="queueCapacity" value="10" />
+    </beans:bean>
+
+</beans:beans>
