@@ -11,16 +11,15 @@
 		https://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <context:annotation-config />
-    <!--<context:component-scan base-package="com.solace.swim" /> -->
 
     <beans:bean id="envProducer" class="java.util.Hashtable">
         <beans:constructor-arg>
             <beans:map key-type="java.lang.Object" value-type="java.lang.String">
                 <beans:entry key="java.naming.factory.initial" value="com.solacesystems.jndi.SolJNDIInitialContextFactory"/>
                 <beans:entry key="java.naming.provider.url" value="${service.solace-publishing.jms.host}"/>
-                <beans:entry key="Solace_JMS_VPN" value="${service.solace-publishing.jms.msgVpn}"/>
-                <beans:entry key="java.naming.security.principal" value="${service.solace-publishing.jms.clientUsername}"/>
-                <beans:entry key="java.naming.security.credentials" value="${service.solace-publishing.jms.clientPassword}"/>
+                <beans:entry key="Solace_JMS_VPN" value="${service.solace-publishing.jms.msg-vpn}"/>
+                <beans:entry key="java.naming.security.principal" value="${service.solace-publishing.jms.client-username}"/>
+                <beans:entry key="java.naming.security.credentials" value="${service.solace-publishing.jms.client-password}"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>
@@ -30,9 +29,9 @@
             <beans:map key-type="java.lang.Object" value-type="java.lang.String">
                 <beans:entry key="java.naming.factory.initial" value="com.solacesystems.jndi.SolJNDIInitialContextFactory"/>
                 <beans:entry key="java.naming.provider.url" value="${solace.jms.consumer.host}"/>
-                <beans:entry key="Solace_JMS_VPN" value="${solace.jms.consumer.msgVpn}"/>
-                <beans:entry key="java.naming.security.principal" value="${solace.jms.consumer.clientUsername}"/>
-                <beans:entry key="java.naming.security.credentials" value="${solace.jms.consumer.clientPassword}"/>
+                <beans:entry key="Solace_JMS_VPN" value="${solace.jms.consumer.msg-vpn}"/>
+                <beans:entry key="java.naming.security.principal" value="${solace.jms.consumer.client-username}"/>
+                <beans:entry key="java.naming.security.credentials" value="${solace.jms.consumer.client-password}"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>

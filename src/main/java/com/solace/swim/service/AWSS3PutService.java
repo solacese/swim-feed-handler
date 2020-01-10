@@ -46,16 +46,16 @@ public class AWSS3PutService {
 
     private static final Logger logger = LoggerFactory.getLogger(AWSS3PutService.class);
 
-    @Value("${service.aws-s3-put.regionName}")
+    @Value("${service.aws-s3-put.region-name}")
     private String regionName;
 
-    @Value("${service.aws-s3-put.accessKey}")
+    @Value("${service.aws-s3-put.access-key}")
     private String accessKey;
 
-    @Value("${service.aws-s3-put.secretKey}")
+    @Value("${service.aws-s3-put.secret-key}")
     private String secretKey;
 
-    @Value("${service.aws-s3-put.bucketName}")
+    @Value("${service.aws-s3-put.bucket-name}")
     private String bucketName;
 
     private AmazonS3 s3Client;

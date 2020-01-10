@@ -35,7 +35,7 @@ import org.springframework.scheduling.annotation.Async;
 @ConditionalOnProperty(prefix = "service.aws-s3-put", value = "enabled", havingValue = "true")
 public class AWSS3PutServiceActivator {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileOutputServiceActivator.class);
+    private static final Logger logger = LoggerFactory.getLogger(AWSS3PutServiceActivator.class);
 
     @Autowired
     AWSS3PutService service;

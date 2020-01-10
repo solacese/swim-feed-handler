@@ -32,7 +32,6 @@ import org.springframework.jndi.JndiTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -47,7 +46,7 @@ public class ProducerConfiguration {
     @Autowired
     Hashtable envProducer;
 
-    @Value("${service.solace-publishing.jms.connectionFactory}")
+    @Value("${service.solace-publishing.jms.connection-factory}")
     private String producerConnectionFactoryName;
 
     private JndiTemplate jndiTemplate;

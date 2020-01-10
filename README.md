@@ -62,12 +62,12 @@ portal update the consumer connection properties
 
 ```
 solace.jms.consumer.host=tcps://[host]:[port]  (SCDS property: JMS Connection URL)
-solace.jms.consumer.msgVpn=[messageVPN]  (i.e. STDDS, FDPS, ITWS)
-solace.jms.consumer.clientUsername=[username]]  (SCDS property: Connection Username)
-solace.jms.consumer.clientPassword=[password] (SCDS property: Connection Password)
-solace.jms.consumer.connectionFactory=[connection-factory]  (SCDS property: Connection Factory i.e. usually in format of username.CF)
+solace.jms.consumer.msg-vpn=[messageVPN]  (i.e. STDDS, FDPS, ITWS)
+solace.jms.consumer.client-username=[username]]  (SCDS property: Connection Username)
+solace.jms.consumer.client-password=[password] (SCDS property: Connection Password)
+solace.jms.consumer.connection-factory=[connection-factory]  (SCDS property: Connection Factory i.e. usually in format of username.CF)
 
-solace.jms.consumer.queueName.0=[queue-name]  (SCDS property: Queue Name i.e. format of username.MESSAGE_VPN.UUID.OUT)
+solace.jms.consumer.queue-name.0=[queue-name]  (SCDS property: Queue Name i.e. format of username.MESSAGE_VPN.UUID.OUT)
 ```
 Sometimes it will be necessary to create multiple connections to a single Message VPN to connect
 to multiple queues due to data rates or specific filter needs.  For example, the STDDS data rate 
@@ -79,11 +79,11 @@ The application.properties file can support multiple queue configurations.  Simp
 index for the Queue name property.  The following is an example of multiple queues from the same 
 VPN.
 ```
-solace.jms.consumer.queueName.0=[queue 1 name]
-solace.jms.consumer.queueName.1=[queue 2 name]
-solace.jms.consumer.queueName.2=[queue 3 name]
+solace.jms.consumer.queue-name.0=[queue 1 name]
+solace.jms.consumer.queue-name.1=[queue 2 name]
+solace.jms.consumer.queue-name.2=[queue 3 name]
 ...
-solace.jms.consumer.queueName.n=[queue n+1 name]
+solace.jms.consumer.queue-name.n=[queue n+1 name]
 ```
 The consumer code is multi-threaded.  The property ```solace.jms.consumer.maxListeners``` provides
 a mechanism to limit the number of threads that are dedicated to consuming messages from the SCDS
@@ -98,16 +98,16 @@ for publication into your instance of a Solace Broker.  Provide the following pr
 the publishing service.
 ```
 service.solace-publishing.jms.host=[protocol]://[host]:[port]  (i.e. tcp://localhost:55555)
-service.solace-publishing.jms.msgVpn=[messageVPN]   (i.e. default)
-service.solace-publishing.jms.clientUsername=[username]
-service.solace-publishing.jms.clientPassword=[password]
-service.solace-publishing.jms.connectionFactory=/jms/cf/default  (this is the default connection factory)
+service.solace-publishing.jms.msg-vpn=[messageVPN]   (i.e. default)
+service.solace-publishing.jms.client-username=[username]
+service.solace-publishing.jms.client-password=[password]
+service.solace-publishing.jms.connection-factory=/jms/cf/default  (this is the default connection factory)
 ```
 
 ### 2.  Build/Package/Deploy the application
 Build the project from source using Maven.
 
-```mvn clean package```
+```mvnw clean package```
 
 Upon successful completion, a compressed tar file (```swim-feed-handler-VERSION.tar.gz```) will be generated in the 
 ```target``` subdirectory.  Copy the file to the final system and extract the contents with the following
@@ -136,7 +136,7 @@ data, run:
  ##### 3.1.2 From Maven
  The application may also be run from the development environment using Maven.  After
  
- ```mvn spring-boot:run -Dspring-boot.run.profiles=profile_name```
+ ```mvnw spring-boot:run -Dspring-boot.run.profiles=profile_name```
  
  ##### 3.1.3 From IDE
  You can run the application from your IDE of choice.  To run from you IDE, create a Run Configuration and
@@ -171,8 +171,7 @@ This project is licensed under the Apache License, Version 2.0. - See the [LICEN
 
 For more information try these resources:
 
-- The Solace Developer Portal website at: http://dev.solace.com
-- Get a better understanding of [Solace technology](http://dev.solace.com/tech/).
+- The Solace Developer Portal website at: http://solace.dev
 - Check out the [Solace blog](http://dev.solace.com/blog/) for other interesting discussions around Solace technology
 - Ask the [Solace community.](http://dev.solace.com/community/)
 

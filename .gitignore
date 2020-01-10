@@ -2,7 +2,10 @@
 # Created by https://www.gitignore.io/api/osx,java,linux,maven,windows,eclipse,intellij,code-java
 # Edit at https://www.gitignore.io/?templates=osx,java,linux,maven,windows,eclipse,intellij,code-java
 
+# Custom
 log/
+data/
+config/application-test.properties
 
 ### Code-Java ###
 # Language Support for Java(TM) by Red Hat extension for Visual Studio Code - https://marketplace.visualstudio.com/items?itemName=redhat.java

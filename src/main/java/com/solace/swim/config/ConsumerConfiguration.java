@@ -26,8 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerEndpointRegistrar;
-import org.springframework.jms.config.SimpleJmsListenerEndpoint;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
@@ -46,7 +44,7 @@ import java.util.Hashtable;
 @EnableJms
 @Configuration
 public class ConsumerConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger("com.solace.swim");
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerConfiguration.class);
 
     InitialContext initialContextConsumer;
 
@@ -56,7 +54,7 @@ public class ConsumerConfiguration {
     @Autowired
     Hashtable envConsumer;
 
-    @Value("${solace.jms.consumer.connectionFactory}")
+    @Value("${solace.jms.consumer.connection-factory}")
     private String consumerConnectionFactoryName;
 
     /**
@@ -97,8 +95,7 @@ public class ConsumerConfiguration {
                 String output = os.toString("UTF8");
                 logger.error("============= Error processing message: " + t.getMessage()+"\n"+output);
             } catch (UnsupportedEncodingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("An error occurred." + t.getMessage());
             }
 
         }
