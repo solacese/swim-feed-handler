@@ -52,7 +52,11 @@ public class FileOutputService {
 
     // Get the output directory from property file otherwise default to "log/data"
     @Value("${service.file-output.directory:log/data}")
-    String outputDirectory;
+    private String outputDirectory;
+
+    // Determine if the message headers should also be written to file
+    @Value("${service.file-output.write-headers:true}")
+    private boolean writeHeaders;
 
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd_mmssSS");
 
@@ -67,17 +71,20 @@ public class FileOutputService {
     public void write(Message message) {
         logger.info("File being written...");
         String filename = dateFormatter.format(new Date());
-        File file = new File(outputDirectory + File.separator + filename);
-        File header = new File(outputDirectory + File.separator + filename + ".header");
 
-        try (FileOutputStream stream = new FileOutputStream(header)) {
-            stream.write(getHeaders(message).getBytes());
-        } catch (FileNotFoundException e) {
-            logger.error("File not found", e);
-        } catch (IOException e) {
-            logger.error("Failed to close the file", e);
+        if (writeHeaders) {
+            File header = new File(outputDirectory + File.separator + filename + ".header");
+
+            try (FileOutputStream stream = new FileOutputStream(header)) {
+                stream.write(getHeaders(message).getBytes());
+            } catch (FileNotFoundException e) {
+                logger.error("File not found", e);
+            } catch (IOException e) {
+                logger.error("Failed to close the file", e);
+            }
         }
 
+        File file = new File(outputDirectory + File.separator + filename);
         try (FileOutputStream stream = new FileOutputStream(file)) {
             stream.write(getMessageContent(message).getBytes());
         } catch (FileNotFoundException e) {
