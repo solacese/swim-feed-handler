@@ -14,14 +14,15 @@
 
     <beans:bean id="envProducer" class="java.util.Hashtable">
         <beans:constructor-arg>
-            <beans:map key-type="java.lang.Object" value-type="java.lang.String">
-                <beans:entry key="java.naming.factory.initial" value="com.solacesystems.jndi.SolJNDIInitialContextFactory"/>
-                <beans:entry key="java.naming.provider.url" value="${service.solace-publishing.jms.host}"/>
-                <beans:entry key="Solace_JMS_VPN" value="${service.solace-publishing.jms.msg-vpn}"/>
-                <beans:entry key="java.naming.security.principal" value="${service.solace-publishing.jms.client-username}"/>
-                <beans:entry key="java.naming.security.credentials" value="${service.solace-publishing.jms.client-password}"/>
+            <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
+                <beans:entry key="jcsmp.HOST" value="${service.solace-publishing.host}"/>
+                <beans:entry key="jcsmp.VPN_NAME" value="${service.solace-publishing.msg-vpn}"/>
+                <beans:entry key="jcsmp.USERNAME" value="${service.solace-publishing.client-username}"/>
+                <beans:entry key="jcsmp.PASSWORD" value="${service.solace-publishing.client-password}"/>
+                <beans:entry key="jcsmp.PUB_ACK_WINDOW_SIZE" value="255"/>
             </beans:map>
         </beans:constructor-arg>
+
     </beans:bean>
 
     <beans:bean id="envConsumer" class="java.util.Hashtable">
@@ -47,9 +48,12 @@
     <int:publish-subscribe-channel id="msg.scds.service" task-executor="taskExecutor"/>
 
     <beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <beans:property name="corePoolSize" value="2" />
-        <beans:property name="maxPoolSize" value="20" />
-        <beans:property name="queueCapacity" value="10" />
+        <beans:property name="corePoolSize" value="1" />
+        <beans:property name="maxPoolSize" value="${service.max-thread-count}" />
+        <beans:property name="queueCapacity" value="100" />
+        <beans:property name="rejectedExecutionHandler" ref="blockCallerExecutionPolicy" />
     </beans:bean>
+
+    <beans:bean id="blockCallerExecutionPolicy" class="com.solace.swim.util.BlockCallerExecutionPolicy" />
 
 </beans:beans>

@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.service;
+package com.solace.swim.service.publish;
 
+import com.solace.swim.service.IServiceActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import org.springframework.scheduling.annotation.Async;
  */
 @MessageEndpoint
 @ConditionalOnProperty(prefix = "service.solace-publishing", value = "enabled", havingValue = "true")
-public class SolacePublishingServiceActivator {
+public class SolacePublishingServiceActivator implements IServiceActivator {
 
     private static final Logger logger = LoggerFactory.getLogger(SolacePublishingServiceActivator.class);
 
@@ -43,8 +44,9 @@ public class SolacePublishingServiceActivator {
 
     @ServiceActivator (inputChannel = "msg.scds.service")
     @Async
+    @Override
     public void processMessage(Message msg) {
-        service.publish(msg);
+        service.invoke(msg.getHeaders(), (String)msg.getPayload());
         return;
     }
 

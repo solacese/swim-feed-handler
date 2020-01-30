@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.service;
+package com.solace.swim.service.file;
 
+import com.solace.swim.service.IService;
+import com.solace.swim.util.MessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -32,8 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Service class designed to write data to disk.  The payload of the message will be written as a file.
@@ -46,7 +46,7 @@ import java.util.Set;
  */
 @Service
 @ConditionalOnProperty(prefix = "service.file-output", value = "enabled", havingValue = "true")
-public class FileOutputService {
+public class FileOutputService implements IService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileOutputService.class);
 
@@ -64,11 +64,12 @@ public class FileOutputService {
     private void init() {
         File dir = new File(outputDirectory);
         if (!dir.exists()) {
-            dir.mkdir();
+            dir.mkdirs();
         }
     }
 
-    public void write(Message message) {
+    @Override
+    public void invoke(Map<String, ?> headers, String payload) {
         logger.info("File being written...");
         String filename = dateFormatter.format(new Date());
 
@@ -76,7 +77,7 @@ public class FileOutputService {
             File header = new File(outputDirectory + File.separator + filename + ".header");
 
             try (FileOutputStream stream = new FileOutputStream(header)) {
-                stream.write(getHeaders(message).getBytes());
+                stream.write(MessageUtil.getHeaders(headers).getBytes());
             } catch (FileNotFoundException e) {
                 logger.error("File not found", e);
             } catch (IOException e) {
@@ -86,7 +87,7 @@ public class FileOutputService {
 
         File file = new File(outputDirectory + File.separator + filename);
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            stream.write(getMessageContent(message).getBytes());
+            stream.write(payload.getBytes());
         } catch (FileNotFoundException e) {
             logger.error("File not found", e);
         } catch (IOException e) {
@@ -95,26 +96,4 @@ public class FileOutputService {
             logger.error("Error in getting content", ex);
         }
     }
-
-    public String getMessageContent(Message message) throws Exception {
-        return (String)message.getPayload();
-    }
-
-    public String getHeaders(Message message) {
-        try {
-            StringBuilder builder = new StringBuilder();
-
-            Enumeration propertyNames = null;
-            Set<String> headers = message.getHeaders().keySet();
-
-            for(String key: headers) {
-                builder.append(key + "=" + message.getHeaders().get(key));
-                builder.append("\n");
-            }
-            return builder.toString();
-        } catch (Exception ex) {
-            return "Error in generating headers";
-        }
-    }
-
 }

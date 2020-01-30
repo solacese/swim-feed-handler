@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.service;
+package com.solace.swim.service.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -24,6 +24,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CreateBucketRequest;
+import com.solace.swim.service.IService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Map;
 
 /**
  * Service class designed to write a String object to an AWS S3 store.  The current time in
@@ -42,7 +44,7 @@ import javax.annotation.PostConstruct;
  */
 @Service
 @ConditionalOnProperty(prefix = "service.aws-s3-put", value = "enabled", havingValue = "true")
-public class AWSS3PutService {
+public class AWSS3PutService implements IService {
 
     private static final Logger logger = LoggerFactory.getLogger(AWSS3PutService.class);
 
@@ -83,10 +85,11 @@ public class AWSS3PutService {
         }
     }
 
-    public void putObject(String message) {
+    @Override
+    public void invoke(Map<String, ?> headers, String payload) {
         try {
             logger.info("Message received. Attempting to store to AWS S3...");
-            s3Client.putObject(bucketName, Long.toString(System.currentTimeMillis()), message);
+            s3Client.putObject(bucketName, Long.toString(System.currentTimeMillis()), payload);
             logger.info("Message store successful to AWS S3 bucket {}", bucketName);
         } catch (Exception e) {
             logger.error("Unable to store message to AWS S3.", e);

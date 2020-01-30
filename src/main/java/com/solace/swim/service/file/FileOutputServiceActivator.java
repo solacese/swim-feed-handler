@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.service;
+package com.solace.swim.service.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class FileOutputServiceActivator {
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
     public void processMessage(Message msg) {
-        service.write(msg);
+        service.invoke(msg.getHeaders(), (String)msg.getPayload());
         return;
     }
 

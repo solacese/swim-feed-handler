@@ -26,12 +26,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
+
 
 /**
  * Main Application class.
@@ -70,21 +72,29 @@ public class SWIMFeedHandler {
 		@JmsListener(id="queue0", destination = "${solace.jms.consumer.queue-name.0}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		//@JmsListener(id="queue1", destination = "${solace.jms.consumer.queue-name.1}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		//@JmsListener(id="queue2", destination = "${solace.jms.consumer.queue-name.2}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
-		public void handleMsg(Message<?> msg) {
-
+		public void handleMsg(Message msg) throws InterruptedException {
 			// Print headers if DEBUG is turned on
 			if (logger.isDebugEnabled()) {
 				StringBuffer msgAsStr = new StringBuffer("============= Received \nHeaders:");
+
+
 				MessageHeaders hdrs = msg.getHeaders();
 				msgAsStr.append("\nUUID: " + hdrs.getId());
 				msgAsStr.append("\nTimestamp: " + hdrs.getTimestamp());
 				for (String key: hdrs.keySet()) {
 					msgAsStr.append("\n" + key + ": " + hdrs.get(key));
 				}
-				logger.info(msgAsStr.toString());
+				logger.debug(msgAsStr.toString());
 			}
 			logger.info("SCDS Message received...");
-			msgConsumer.processMsg(msg);
+
+			try {
+				msgConsumer.processMsg(msg);
+			} catch (TaskRejectedException ex) {
+				logger.info("Rejected Task: Trying to process message again.");
+				msgConsumer.processMsg(msg);
+				logger.info("Rejected Task: Message was processed successfully.");
+			}
 		}
 	}
 

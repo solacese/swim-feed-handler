@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.service;
+package com.solace.swim.service.aws;
 
+import com.solace.swim.service.IServiceActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ import org.springframework.scheduling.annotation.Async;
  */
 @MessageEndpoint
 @ConditionalOnProperty(prefix = "service.aws-s3-put", value = "enabled", havingValue = "true")
-public class AWSS3PutServiceActivator {
+public class AWSS3PutServiceActivator implements IServiceActivator {
 
     private static final Logger logger = LoggerFactory.getLogger(AWSS3PutServiceActivator.class);
 
@@ -42,8 +43,9 @@ public class AWSS3PutServiceActivator {
 
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
+    @Override
     public void processMessage(Message msg) {
-        service.putObject((String)msg.getPayload());
+        service.invoke(msg.getHeaders(), (String)msg.getPayload());
         return;
     }
 }

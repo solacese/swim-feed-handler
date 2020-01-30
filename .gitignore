@@ -5,7 +5,7 @@
 # Custom
 log/
 data/
-config/application-test.properties
+config/application-test*.properties
 
 ### Code-Java ###
 # Language Support for Java(TM) by Red Hat extension for Visual Studio Code - https://marketplace.visualstudio.com/items?itemName=redhat.java

@@ -18,8 +18,8 @@ As stated, this project provides a Spring Boot Auto-Configuration that consumes 
 SWIM Cloud Distribution Service (SCDS) and then re-publishes to a local Solace PS+ broker 
 instance.  The idea is that you may run multiple clients within your organization that
 consume data from the US SWIM feed.  By running the SWIM Feed Handler, you can create
-one consumer (may require multiple instances depending on subscriptions) that consumes
-all data vs. each client making a connection to SCDS.  This saves bandwidth on both 
+and manage a consumer (may require multiple instances depending on subscriptions) that consumes
+the data vs. each client making a connection to SCDS.  This saves bandwidth on both 
 SCDS' egress and your organization's ingress.  By publishing to a local Solace PS+ instance
 you have more flexibility in your client data needs using built in Solace broker capabilities
 including protocol choices, enhanced filter capabilities and your choice of programming 
@@ -34,8 +34,10 @@ once consumed.  By default the Solace Publishing Service is enabled and is desig
 publish the consumed message back into a local Solace PS+ broker instance.
 
 Other sample service included are a FileOutputService, which writes consumed messages to
-the file system, and an AWS Simple Storage Service (S3), whichs writes the payload of the 
-consumed messages to S3 as a string.  
+the file system, and an AWS Simple Storage Service (S3), which writes the payload of the 
+consumed messages to S3 as a string.
+  
+![SWIM Feed Handler](images/sfh.png)
 
 The additional services are disabled by default and show how the processing of the message
 can be extended (e.g. writing the data to a database).
@@ -87,10 +89,15 @@ solace.jms.consumer.queue-name.n=[queue n+1 name]
 ```
 The consumer code is multi-threaded.  The property ```solace.jms.consumer.maxListeners``` provides
 a mechanism to limit the number of threads that are dedicated to consuming messages from the SCDS
-queue.  Default of ```5``` threads will be sufficient for most of the SCDS flows.  Due to STDDS high
-data rate it is recommended to set the value to greater than the default value of ```5```.  This will likely be a trial
+queue.  The SFH was tested in an AWS environment using a t3a.micro sized EC2 and each data type has
+default values and should be sufficient for most of the SCDS flows.  Your specific scenario might 
+warrant increase in these values.  This will likely be a trial
 and error scenario.  Monitor to the SCDS metric of expired messages to determine if the value
 should increase or decrease.
+
+During testing, it was found that the FDPS flow required multiple instances of the SWIM Feed Handler
+to be run in order to keep up with the data rates.  Increasing the ```maxListeners``` did not produce
+results expected.  If you are consuming the full flow of FDPS, run multiple instances of the application.
 
 #### 1.2 Producer configuration
 Similar to the consumer configuration properties, there are configuration properties needed
@@ -101,7 +108,6 @@ service.solace-publishing.jms.host=[protocol]://[host]:[port]  (i.e. tcp://local
 service.solace-publishing.jms.msg-vpn=[messageVPN]   (i.e. default)
 service.solace-publishing.jms.client-username=[username]
 service.solace-publishing.jms.client-password=[password]
-service.solace-publishing.jms.connection-factory=/jms/cf/default  (this is the default connection factory)
 ```
 
 ### 2.  Build/Package/Deploy the application
@@ -171,7 +177,8 @@ This project is licensed under the Apache License, Version 2.0. - See the [LICEN
 
 For more information try these resources:
 
-- The Solace Developer Portal website at: http://solace.dev
+- To get access to [SWIM](https://www.faa.gov/air_traffic/technology/swim/products/get_connected/) data 
+- The Solace Developer Portal website at http://solace.dev
 - Check out the [Solace blog](http://dev.solace.com/blog/) for other interesting discussions around Solace technology
 - Ask the [Solace community.](http://dev.solace.com/community/)
 
