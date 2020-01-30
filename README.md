@@ -91,23 +91,19 @@ The consumer code is multi-threaded.  The property ```solace.jms.consumer.maxLis
 a mechanism to limit the number of threads that are dedicated to consuming messages from the SCDS
 queue.  The SFH was tested in an AWS environment using a t3a.micro sized EC2 and each data type has
 default values and should be sufficient for most of the SCDS flows.  Your specific scenario might 
-warrant increase in these values.  This will likely be a trial
+warrant increase in this values.  This will likely be a trial
 and error scenario.  Monitor to the SCDS metric of expired messages to determine if the value
 should increase or decrease.
-
-During testing, it was found that the FDPS flow required multiple instances of the SWIM Feed Handler
-to be run in order to keep up with the data rates.  Increasing the ```maxListeners``` did not produce
-results expected.  If you are consuming the full flow of FDPS, run multiple instances of the application.
 
 #### 1.2 Producer configuration
 Similar to the consumer configuration properties, there are configuration properties needed
 for publication into your instance of a Solace Broker.  Provide the following properties for
 the publishing service.
 ```
-service.solace-publishing.jms.host=[protocol]://[host]:[port]  (i.e. tcp://localhost:55555)
-service.solace-publishing.jms.msg-vpn=[messageVPN]   (i.e. default)
-service.solace-publishing.jms.client-username=[username]
-service.solace-publishing.jms.client-password=[password]
+service.solace-publishing.host=[protocol]://[host]:[port]  (i.e. tcp://localhost:55555)
+service.solace-publishing.msg-vpn=[messageVPN]   (i.e. default)
+service.solace-publishing.client-username=[username]
+service.solace-publishing.client-password=[password]
 ```
 
 ### 2.  Build/Package/Deploy the application
