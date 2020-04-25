@@ -32,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -71,7 +70,7 @@ public class FileOutputService implements IService {
     @Override
     public void invoke(Map<String, ?> headers, String payload) {
         logger.info("File being written...");
-        String filename = dateFormatter.format(new Date());
+        String filename = MessageUtil.getHeaderValue(headers, "id") ;
 
         if (writeHeaders) {
             File header = new File(outputDirectory + File.separator + filename + ".header");

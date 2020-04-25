@@ -150,7 +150,7 @@ data, run:
  execution.
  
  #### 3.2 Monitor
- Log entries are written to ```log/messages.log``` that indicate current processing actions.  Basic information
+ Log entries are written to ```log/system.log``` that indicate current processing actions.  Basic information
  is provided on execution and should be sufficient to indicate health of the application.  Additional
  debug messages may be turned on by modifying the root log level from ```info``` to ```debug``` in the
  ```resources/logback.xml``` log configuration file.

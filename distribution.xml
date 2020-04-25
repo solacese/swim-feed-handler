@@ -15,9 +15,9 @@
         <fileSet>
             <directory>config</directory>
             <outputDirectory>config</outputDirectory>
-            <includes>
-                <include>**</include>
-            </includes>
+            <excludes>
+                <exclude>*test*</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>

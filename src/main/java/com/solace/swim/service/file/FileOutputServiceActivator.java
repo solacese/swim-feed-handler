@@ -18,6 +18,7 @@
  */
 package com.solace.swim.service.file;
 
+import com.solacesystems.jms.message.SolMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,16 @@ public class FileOutputServiceActivator {
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
     public void processMessage(Message msg) {
-        service.invoke(msg.getHeaders(), (String)msg.getPayload());
+        String payload = "";
+        if (msg.getPayload() instanceof String) {
+            payload = (String)msg.getPayload();
+        } else if (msg.getPayload() instanceof SolMessage) {
+            SolMessage obj = (SolMessage) msg.getPayload();
+            payload = obj.dump();
+        } else if (msg.getPayload() instanceof Object) {
+            payload = msg.getPayload().toString();
+        }
+        service.invoke(msg.getHeaders(), payload);
         return;
     }
 

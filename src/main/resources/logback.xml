@@ -3,11 +3,11 @@
 
     <property name="basePath" value="log/"/>
 
-    <appender name="msgLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${basePath}/messages.log</file>
+    <appender name="eventLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${basePath}/system.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>log/archived/message-%d{yyyy-MM-dd}.log.%i</fileNamePattern>
+            <fileNamePattern>log/archived/system-%d{yyyy-MM-dd}.log.%i</fileNamePattern>
             <!-- each archived file, size max 10MB -->
             <maxFileSize>10MB</maxFileSize>
             <!-- total size of all archive files, if total size > 1GB,
@@ -22,15 +22,30 @@
         </encoder>
     </appender>
 
+    <appender name="hourlyRolloverLogger" class="ch.qos.logback.core.rolling.RollingFileAppender" >
+        <file>${basePath}/messages.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${basePath}/messages.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
+        </rollingPolicy>
+        <param name="Append" value="false" />
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <logger name="com.solace.swim.service.logging.MessageLoggingService" level="INFO" additivity="false">
+        <appender-ref ref="hourlyRolloverLogger" />
+    </logger>
+
     <root level="info">
         <appender-ref ref="console"/>
-        <appender-ref ref="msgLogger"/>
+        <appender-ref ref="eventLogger"/>
     </root>
 
 </configuration>
