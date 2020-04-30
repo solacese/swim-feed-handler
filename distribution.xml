@@ -11,6 +11,14 @@
             <source>target/${project.name}-${project.version}.jar</source>
         </file>
     </files>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>ext</outputDirectory>
+            <includes>
+                <include>org.jasypt:jasypt</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
     <fileSets>
         <fileSet>
             <directory>config</directory>
