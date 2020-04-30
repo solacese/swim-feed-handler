@@ -48,7 +48,7 @@ connections.  Consumer properties are to connect to SCDS.  Producer properties a
 connect to your managed Solace broker either on premise or cloud based.  The property files 
 can be found in the ```config/``` directory.
 
-Passwords can be obfuscated in the property files.  Please refer to [Section 4](#4.--property-password-obfuscation) for
+Passwords can be obfuscated in the property files.  Please refer to [Section 4](#4--property-password-obfuscation) for
 instructions on how to obfuscate data in the property files.
 
 #### 1.1 Consumer connection
@@ -101,11 +101,11 @@ are enabled `service.x.enabled=true` then each message will be processed in para
 `service.max-thread-count` will need to be increased to handle the workload of multiple services.
 
 The following is a list of services that have been provided.
-* [Solace Publishing Service](###1.2.1-solace-publishing-service)
-* [File Output Service](###1.2.2-file-output-service)
-* [Message Logging Service](###1.2.3-message-logging-service)
-* [AWS S3 Put Service](###1.2.4-AWS-S3-Put-Service)
-* [Null Op Service](###1.2.5-null-op-service)
+* [Solace Publishing Service](#121-solace-publishing-service)
+* [File Output Service](#122-file-output-service)
+* [Message Logging Service](#123-message-logging-service)
+* [AWS S3 Put Service](#124-aws-s3-put-service)
+* [Null Op Service](#125-null-op-service)
 
 New services can be created as needed.  Refer to the [Spring Integration Project](https://docs.spring.io/spring-integration/docs/5.2.6.RELEASE/reference/html/)
 for reference documentation on `@Service`, `@ServiceActivator` and `@MessageEndpoint` annotations.
@@ -285,7 +285,7 @@ many ways to pass the secret key while starting spring boot
 If using Maven,  `mvnw spring-boot:run -Dspring-boot.run.profiles=profile_name -Djasypt.encryptor.password=secretkey`.
 
 If using command line, `export JASYPT_ENCRYPTOR_PASSWORD=secretkey` and then run the application as defined in 
-[Section 3.1](#3.1.1-From-command-line).
+[Section 3.1.1](#311-from-command-line).
 
 If using an IDE, add `-Djasypt.encryptor.password=secretkey` to the VM arguments of your Run Configuration.
 
