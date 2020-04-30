@@ -23,9 +23,9 @@
     </appender>
 
     <appender name="hourlyRolloverLogger" class="ch.qos.logback.core.rolling.RollingFileAppender" >
-        <file>${basePath}/messages.log</file>
+        <file>${basePath}/messages-${spring.profiles.active}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${basePath}/messages.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
+            <fileNamePattern>${basePath}/messages-${spring.profiles.active}.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
         </rollingPolicy>
         <param name="Append" value="false" />
         <encoder>

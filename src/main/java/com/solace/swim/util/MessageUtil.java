@@ -1,4 +1,22 @@
 package com.solace.swim.util;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
 public class MessageUtil {
     private static final Logger logger = LoggerFactory.getLogger(MessageUtil.class);
@@ -15,8 +33,7 @@ public class MessageUtil {
     public static String getHeaders(Map<String, ?> headers) {
         StringBuilder builder = new StringBuilder();
         for (String key: headers.keySet()) {
-            builder.append(key + "=" + headers.get(key));
-            builder.append("\n");
+            builder.append(key).append("=").append(headers.get(key)).append("\n");
         }
         return builder.toString();
     }
@@ -32,21 +49,8 @@ public class MessageUtil {
         return Key + " not found.";
     }
 
-    public static String getHeaders(org.springframework.messaging.Message msg) {
-        try {
-            StringBuilder builder = new StringBuilder();
-
-            Enumeration propertyNames = null;
-            Set<String> headers = msg.getHeaders().keySet();
-
-            for(String key: headers) {
-                builder.append(key + "=" + msg.getHeaders().get(key));
-                builder.append("\n");
-            }
-            return builder.toString();
-        } catch (Exception ex) {
-            return "Error in generating headers";
-        }
+    public static String getHeaders(org.springframework.messaging.Message<?> msg) {
+        return getHeaders(msg.getHeaders());
     }
 
     public static String getHeaders(javax.jms.Message msg) {
@@ -56,11 +60,10 @@ public class MessageUtil {
             Enumeration<String> propertyNames = msg.getPropertyNames();
             while (propertyNames.hasMoreElements()) {
                 String property = propertyNames.nextElement();
-                builder.append(property + "=" + msg.getStringProperty(property));
-                builder.append("\n");
+                builder.append(property).append("=").append(msg.getStringProperty(property)).append("\n");
             }
-            builder.append("jms_deliveryMode=" + msg.getJMSDeliveryMode());
-            builder.append("jms_messageID=" + msg.getJMSMessageID());
+            builder.append("jms_deliveryMode=").append(msg.getJMSDeliveryMode()).append("\n");
+            builder.append("jms_messageID=").append(msg.getJMSMessageID()).append("\n");
 
             return builder.toString();
         } catch (Exception ex) {
@@ -69,9 +72,9 @@ public class MessageUtil {
     }
 
     public static String getHeadersAsJSON(Map<String, ?> headers) {
-        String json = null;
+        String json;
         try {
-            json = new ObjectMapper().writeValueAsString(headers);
+            json = new ObjectMapper().writeValueAsString(new TreeMap<String, Object>(headers));
         } catch (JsonProcessingException e) {
             logger.error("Unable to convert header map to JSON: {}", headers);
             json = "";

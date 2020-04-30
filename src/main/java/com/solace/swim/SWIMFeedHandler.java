@@ -1,4 +1,5 @@
-/**
+package com.solace.swim;
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,9 +18,9 @@
  * under the License.
  */
 
-package com.solace.swim;
-
 import com.solace.swim.config.ISCDSConsumer;
+import com.solace.swim.util.MessageUtil;
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +32,6 @@ import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 
 
@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
  * Main Application class.
  */
 @SpringBootApplication
+@EnableEncryptableProperties
 @ImportResource({"classpath*:applicationContext.xml"})
 @EnableIntegration
 @IntegrationComponentScan("com.solace.swim")
@@ -60,7 +61,7 @@ public class SWIMFeedHandler {
 	 * Static class designed to act as the JMS Listener.  Uses the configuration definitions found in
 	 * com.solace.swim.ConsumerConfiguration to connect and consume messages from the SWIM broker.  It
 	 * can support multiple connections to different queues found in the same Solace VPN by creating multiple
-	 * @JMSListener annotations.
+	 * '@JMSListener' annotations.
 	 *
 	 * See com.solace.swim.ConsumerConfiguration for additional configurations
 	 */
@@ -72,19 +73,11 @@ public class SWIMFeedHandler {
 		@JmsListener(id="queue0", destination = "${solace.jms.consumer.queue-name.0}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		//@JmsListener(id="queue1", destination = "${solace.jms.consumer.queue-name.1}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		//@JmsListener(id="queue2", destination = "${solace.jms.consumer.queue-name.2}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
-		public void handleMsg(Message msg) throws InterruptedException {
+		public void handleMsg(Message<?> msg) {
 			// Print headers if DEBUG is turned on
 			if (logger.isDebugEnabled()) {
-				StringBuffer msgAsStr = new StringBuffer("============= Received \nHeaders:");
-
-
-				MessageHeaders hdrs = msg.getHeaders();
-				msgAsStr.append("\nUUID: " + hdrs.getId());
-				msgAsStr.append("\nTimestamp: " + hdrs.getTimestamp());
-				for (String key: hdrs.keySet()) {
-					msgAsStr.append("\n" + key + ": " + hdrs.get(key));
-				}
-				logger.debug(msgAsStr.toString());
+				logger.debug("============= Received \nHeaders:");
+				logger.debug(MessageUtil.getHeaders(msg.getHeaders()));
 			}
 			logger.info("SCDS Message received...");
 

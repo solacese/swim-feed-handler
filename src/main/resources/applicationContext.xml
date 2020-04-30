@@ -18,7 +18,7 @@
                 <beans:entry key="jcsmp.HOST" value="${service.solace-publishing.host}"/>
                 <beans:entry key="jcsmp.VPN_NAME" value="${service.solace-publishing.msg-vpn}"/>
                 <beans:entry key="jcsmp.USERNAME" value="${service.solace-publishing.client-username}"/>
-                <beans:entry key="jcsmp.PASSWORD" value="${service.solace-publishing.client-password}"/>
+                <beans:entry key="jcsmp.PASSWORD" value="#{environment['service.solace-publishing.client-password']}"/>
                 <beans:entry key="jcsmp.PUB_ACK_WINDOW_SIZE" value="255"/>
             </beans:map>
         </beans:constructor-arg>
@@ -32,7 +32,7 @@
                 <beans:entry key="java.naming.provider.url" value="${solace.jms.consumer.host}"/>
                 <beans:entry key="Solace_JMS_VPN" value="${solace.jms.consumer.msg-vpn}"/>
                 <beans:entry key="java.naming.security.principal" value="${solace.jms.consumer.client-username}"/>
-                <beans:entry key="java.naming.security.credentials" value="${solace.jms.consumer.client-password}"/>
+                <beans:entry key="java.naming.security.credentials" value="#{environment['solace.jms.consumer.client-password']}"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>
