@@ -51,7 +51,8 @@ public class MessageLoggingServiceActivator implements IServiceActivator {
     @Autowired
     MessageLoggingService service;
 
-    @Value("${service.message-logging.header-remove-list:''}")
+    // jms_destination must be the minimal
+    @Value("#{'${service.message-logging.header-remove-list}'!=''?'${service.message-logging.header-remove-list}':'jms_destination'}")
     String headersToRemove;
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss:SS'Z'").withZone(ZoneOffset.UTC);
