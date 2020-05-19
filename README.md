@@ -35,7 +35,7 @@ message log while rotating every hour and a NullOp service that discards the mes
 ![SWIM Feed Handler](images/sfh.png)
 
 The services are disabled by default and show how the processing of the message
-can be extended (e.g. writing the data to a database).
+can be extended (e.g. writing the message content to a file).
 
 To use the application perform the following steps:
 1. [Update application properties](#1-update-the-applicationproperties)
@@ -109,6 +109,10 @@ The following is a list of services that have been provided.
 
 New services can be created as needed.  Refer to the [Spring Integration Project](https://docs.spring.io/spring-integration/docs/5.2.6.RELEASE/reference/html/)
 for reference documentation on `@Service`, `@ServiceActivator` and `@MessageEndpoint` annotations.
+
+The following diagram documents how messages traverse the application to the targeted service endpoint.
+
+![SWIM Feed Handler](images/sfh_eip.png)
 
 ##### 1.2.1 Solace Publishing Service
 The purpose of this service is to publish messages back into a Solace PS+ instance.  The idea is that 

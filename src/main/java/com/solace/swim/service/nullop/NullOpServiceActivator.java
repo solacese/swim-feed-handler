@@ -22,7 +22,6 @@ import com.solace.swim.service.IServiceActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -36,9 +35,6 @@ public class NullOpServiceActivator implements IServiceActivator {
 
     @Autowired
     NullOpService service;
-
-    @Value("${service.null-op.password}")
-    String password;
 
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
