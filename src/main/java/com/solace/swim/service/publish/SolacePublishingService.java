@@ -80,10 +80,18 @@ public class SolacePublishingService implements IService {
         try {
             MessageConverter messageConverter = new SimpleMessageConverter();
 
-            javax.jms.Topic jmsTopic = (javax.jms.Topic)headers.get("jms_destination");
-            final com.solacesystems.jcsmp.Topic topic = JCSMPFactory.onlyInstance().createTopic(jmsTopic.getTopicName());
+            javax.jms.Topic jmsTopic = null;
+            com.solacesystems.jcsmp.Topic topic = null;
+            try {
+                jmsTopic = (javax.jms.Topic)headers.get("jms_destination");
+                topic = JCSMPFactory.onlyInstance().createTopic(jmsTopic.getTopicName());
+            } catch (ClassCastException e) {
+                String jmsDestination = (String) headers.get("jms_destination");
+                topic = JCSMPFactory.onlyInstance().createTopic(jmsDestination);
+            }
 
-            XMLContentMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(XMLContentMessage.class);
+            //XMLContentMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(XMLContentMessage.class);
+            TextMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
             SDTMap properties = JCSMPFactory.onlyInstance().createMap();
 
             for (String header : headers.keySet()) {
@@ -92,7 +100,7 @@ public class SolacePublishingService implements IService {
                 }
                 properties.putString(header, headers.get(header).toString());
             }
-            jcsmpMsg.setXMLContent(payload);
+            jcsmpMsg.setText(payload);
             jcsmpMsg.setDeliveryMode(DeliveryMode.DIRECT);
             jcsmpMsg.setProperties(properties);
 

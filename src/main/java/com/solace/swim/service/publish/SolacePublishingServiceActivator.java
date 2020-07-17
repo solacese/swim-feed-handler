@@ -42,7 +42,7 @@ public class SolacePublishingServiceActivator implements IServiceActivator {
     @Autowired
     SolacePublishingService service;
 
-    @ServiceActivator (inputChannel = "msg.scds.service")
+    @ServiceActivator (inputChannel = "msg.scds.service.publishing")
     @Async
     @Override
     public void processMessage(Message msg) {

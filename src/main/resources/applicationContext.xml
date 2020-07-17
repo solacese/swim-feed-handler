@@ -3,27 +3,20 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans"
              xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+             xmlns:int-file="http://www.springframework.org/schema/integration/file"
              xsi:schemaLocation="http://www.springframework.org/schema/beans
 		https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context
 		https://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/integration
-		https://www.springframework.org/schema/integration/spring-integration.xsd">
+		https://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/xml
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
+        http://www.springframework.org/schema/integration/file
+        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
 
     <context:annotation-config />
-
-    <beans:bean id="envProducer" class="java.util.Hashtable">
-        <beans:constructor-arg>
-            <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
-                <beans:entry key="jcsmp.HOST" value="${service.solace-publishing.host}"/>
-                <beans:entry key="jcsmp.VPN_NAME" value="${service.solace-publishing.msg-vpn}"/>
-                <beans:entry key="jcsmp.USERNAME" value="${service.solace-publishing.client-username}"/>
-                <beans:entry key="jcsmp.PASSWORD" value="#{environment['service.solace-publishing.client-password']}"/>
-                <beans:entry key="jcsmp.PUB_ACK_WINDOW_SIZE" value="255"/>
-            </beans:map>
-        </beans:constructor-arg>
-
-    </beans:bean>
 
     <beans:bean id="envConsumer" class="java.util.Hashtable">
         <beans:constructor-arg>
@@ -55,5 +48,4 @@
     </beans:bean>
 
     <beans:bean id="blockCallerExecutionPolicy" class="com.solace.swim.util.BlockCallerExecutionPolicy" />
-
 </beans:beans>

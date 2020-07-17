@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:int="http://www.springframework.org/schema/integration"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+             xmlns:int-file="http://www.springframework.org/schema/integration/file"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		https://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/xml
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
+        http://www.springframework.org/schema/integration/file
+        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+
+    <beans:bean id="envProducer" class="java.util.Hashtable">
+        <beans:constructor-arg>
+            <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
+                <beans:entry key="jcsmp.HOST" value="${service.solace-publishing.host}"/>
+                <beans:entry key="jcsmp.VPN_NAME" value="${service.solace-publishing.msg-vpn}"/>
+                <beans:entry key="jcsmp.USERNAME" value="${service.solace-publishing.client-username}"/>
+                <beans:entry key="jcsmp.PASSWORD" value="#{environment['service.solace-publishing.client-password']}"/>
+                <beans:entry key="jcsmp.PUB_ACK_WINDOW_SIZE" value="255"/>
+            </beans:map>
+        </beans:constructor-arg>
+
+    </beans:bean>
+
+    <int-xml:xpath-expression id="fdpsTopic" expression="concat('FDPS/position/',
+                                                                message/flight/flightPlan/@identifier,'/',
+                                                                message/flight/flightStatus/@fdpsFlightStatus,'/',
+                                                                message/flight/flightIdentification/@aircraftIdentification,'/',
+                                                                substring-before(message/flight/enRoute/position/position/location/pos,' '),'/',
+                                                                substring-after(message/flight/enRoute/position/position/location/pos,' '),'/',
+                                                                message/flight/enRoute/position/actualSpeed/surveillance,'/',
+                                                                message/flight/enRoute/position/altitude,'/',
+                                                                message/flight/enRoute/position/trackVelocity/x,'/',
+                                                                message/flight/enRoute/position/trackVelocity/y
+                                                        )"
+                              ns-prefix="ns5"
+                              ns-uri="http://www.faa.aero/nas/3.0" />
+
+    <int-xml:xpath-router id="fdpsPosition" input-channel="msg.scds.service"  evaluate-as-string="true" >
+        <int-xml:xpath-expression expression="boolean(ns5:MessageCollection/message/flight/enRoute/position)"
+                                  ns-prefix="ns5"
+                                  ns-uri="http://www.faa.aero/nas/3.0"
+        />
+        <int-xml:mapping value="true" channel="msg.scds.service.fdps.position" />
+        <int-xml:mapping value="false" channel="msg.scds.service.publishing" />
+    </int-xml:xpath-router>
+
+    <int:chain input-channel="msg.scds.service.fdps.position"
+               output-channel="msg.scds.service.publishing">
+        <int-xml:xpath-splitter>
+            <int-xml:xpath-expression expression="ns5:MessageCollection/message"
+                                      ns-prefix="ns5"
+                                      ns-uri="http://www.faa.aero/nas/3.0" />
+        </int-xml:xpath-splitter>
+
+        <int-xml:xpath-header-enricher>
+            <int-xml:header name="jms_destination"
+                            evaluation-type="STRING_RESULT"
+                            overwrite="true"
+                            xpath-expression-ref="fdpsTopic"/>
+        </int-xml:xpath-header-enricher>
+
+        <int-xml:xslt-transformer xsl-resource="classpath:fdps-json.xsl"  />
+
+    </int:chain>
+
+</beans:beans>
