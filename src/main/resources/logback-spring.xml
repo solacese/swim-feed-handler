@@ -4,7 +4,7 @@
     <property name="basePath" value="log/"/>
 
     <appender name="eventLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${basePath}/system.log</file>
+        <file>${basePath}/system-${spring.profiles.active}.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>log/archived/system-%d{yyyy-MM-dd}.log.%i</fileNamePattern>
@@ -23,7 +23,7 @@
     </appender>
 
     <appender name="hourlyRolloverLogger" class="ch.qos.logback.core.rolling.RollingFileAppender" >
-        <file>${basePath}/messages-${spring.profiles.active}.log</file>
+       <file>${basePath}/messages-${spring.profiles.active}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${basePath}/messages-${spring.profiles.active}.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
         </rollingPolicy>
