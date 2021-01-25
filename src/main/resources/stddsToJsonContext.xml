@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:int="http://www.springframework.org/schema/integration"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+             xmlns:int-file="http://www.springframework.org/schema/integration/file"
+             xmlns:cache="http://www.springframework.org/schema/cache"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		https://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/xml
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
+        http://www.springframework.org/schema/integration/file
+        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
+>
+
+ <!--   <int:header-value-router input-channel="msg.scds.service" header-name="msgType" default-output-channel="msg.dlq">
+        <int:mapping value="AT" channel="msg.scds.service.stdds.smes"/>
+    </int:header-value-router>-->
+    <int:filter input-channel="msg.scds.service" output-channel="msg.scds.service.stdds.smes" expression="headers.containsKey('msgType')?headers.get('msgType').contains('AT'):'false'" discard-channel="dlq-logging"/>
+
+    <int-xml:xpath-router id="smesPositionReport" input-channel="msg.scds.service.stdds.smes"  evaluate-as-string="true" >
+        <int-xml:xpath-expression expression="boolean(ns2:asdexMsg/positionReport)"
+                                  ns-prefix="ns2"
+                                  ns-uri="urn:us:gov:dot:faa:atm:terminal:entities:v4-0:smes:surfacemovementevent"
+        />
+        <int-xml:mapping value="true" channel="msg.scds.service.stdds.smes.position" />
+        <int-xml:mapping value="false" channel="dlq-logging" />
+    </int-xml:xpath-router>
+
+    <int:chain input-channel="msg.scds.service.stdds.smes.position"
+               output-channel="msg.scds.service.publishing">
+        <int-xml:xpath-splitter>
+            <int-xml:xpath-expression expression="ns2:asdexMsg/positionReport"
+                                      ns-prefix="ns2"
+                                      ns-uri="urn:us:gov:dot:faa:atm:terminal:entities:v4-0:smes:surfacemovementevent" />
+        </int-xml:xpath-splitter>
+
+        <!--<int-xml:xpath-header-enricher>
+            <int-xml:header name="jms_destination"
+                            evaluation-type="STRING_RESULT"
+                            overwrite="true"
+                            xpath-expression="concat('STDDS/',
+                                                     'position/',
+                                                     positionReport/airport,'/',
+                                                     positionReport/flightId/@aircraftId)"/>
+        </int-xml:xpath-header-enricher>-->
+
+        <int-xml:xslt-transformer xsl-resource="classpath:stdds-smes-json.xsl"  />
+
+        <int:service-activator method="lookupSMES">
+            <beans:bean class="com.solace.swim.service.cache.CacheLookupService" />
+        </int:service-activator>
+
+        <int:header-enricher>
+            <int:header name="jms_destination" overwrite="true" expression="'STDDS/position/' + #jsonPath(payload, '$.airport') + '/' + #jsonPath(payload, '$.aircraftIdentification')" />
+        </int:header-enricher>
+
+    </int:chain>
+
+
+</beans:beans>

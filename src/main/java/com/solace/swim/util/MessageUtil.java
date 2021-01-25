@@ -57,6 +57,7 @@ public class MessageUtil {
         try {
             StringBuilder builder = new StringBuilder();
 
+            @SuppressWarnings("unchecked")
             Enumeration<String> propertyNames = msg.getPropertyNames();
             while (propertyNames.hasMoreElements()) {
                 String property = propertyNames.nextElement();

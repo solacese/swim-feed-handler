@@ -35,8 +35,16 @@
                  default-request-channel="msg.scds.service" />
 
     <int:channel id="msg.dlq">
-        <int:queue capacity="1"/>
+        <int:interceptors>
+            <int:wire-tap channel="dlq-logging" />
+        </int:interceptors>
     </int:channel>
+
+    <int:channel id="errorChannel">
+        <int:queue capacity="100"/>
+    </int:channel>
+
+    <int:logging-channel-adapter id="dlq-logging" expression="'Message '.concat(headers.get('id')).concat(' has been discarded.')" level="INFO"/>
 
     <int:publish-subscribe-channel id="msg.scds.service" task-executor="taskExecutor"/>
 
@@ -48,4 +56,5 @@
     </beans:bean>
 
     <beans:bean id="blockCallerExecutionPolicy" class="com.solace.swim.util.BlockCallerExecutionPolicy" />
+
 </beans:beans>

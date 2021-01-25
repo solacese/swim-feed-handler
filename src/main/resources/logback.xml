@@ -4,17 +4,18 @@
     <property name="basePath" value="log/"/>
 
     <appender name="eventLogger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${basePath}/system.log</file>
+        <file>${basePath}/system-${spring.profiles.active}.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>log/archived/system-%d{yyyy-MM-dd}.log.%i</fileNamePattern>
+            <fileNamePattern>${basePath}/archived/system-${spring.profiles.active}-%d{yyyy-MM-dd-HH}.log.%i</fileNamePattern>
             <!-- each archived file, size max 10MB -->
             <maxFileSize>10MB</maxFileSize>
             <!-- total size of all archive files, if total size > 1GB,
 				it will delete old archived file -->
             <totalSizeCap>1GB</totalSizeCap>
-            <!-- 60 days to keep -->
-            <maxHistory>10</maxHistory>
+            <!-- Hours to keep -->
+            <maxHistory>1</maxHistory>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
 
         <encoder>
@@ -43,7 +44,7 @@
         <appender-ref ref="hourlyRolloverLogger" />
     </logger>
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="console"/>
         <appender-ref ref="eventLogger"/>
     </root>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+        xsi:schemaLocation="
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+    <service>
+        <jsr107:defaults >
+            <jsr107:cache name="cache.stdds.smes" template="json-cache"/>
+        </jsr107:defaults>
+    </service>
+
+    <!--<cache alias="cache.stdds.smes" uses-template="json-cache"/>-->
+
+    <cache-template name="json-cache">
+        <!--<key-type>java.lang.Long</key-type>
+        <value-type>com.solace.swim.cache.CacheableJson</value-type>
+        <expiry>
+            <ttl unit="seconds">900</ttl>
+        </expiry>-->
+        <listeners>
+            <listener>
+                <class>com.solace.swim.cache.CustomCacheEventLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>UPDATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+                <events-to-fire-on>REMOVED</events-to-fire-on>
+                <events-to-fire-on>EVICTED</events-to-fire-on>
+            </listener>
+        </listeners>
+        <resources>
+            <heap unit="entries">2000</heap>
+            <offheap unit="MB">100</offheap>
+        </resources>
+    </cache-template>
+</config>

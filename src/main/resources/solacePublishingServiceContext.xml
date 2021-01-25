@@ -29,46 +29,4 @@
 
     </beans:bean>
 
-    <int-xml:xpath-expression id="fdpsTopic" expression="concat('FDPS/position/',
-                                                                message/flight/flightPlan/@identifier,'/',
-                                                                message/flight/flightStatus/@fdpsFlightStatus,'/',
-                                                                message/flight/flightIdentification/@aircraftIdentification,'/',
-                                                                substring-before(message/flight/enRoute/position/position/location/pos,' '),'/',
-                                                                substring-after(message/flight/enRoute/position/position/location/pos,' '),'/',
-                                                                message/flight/enRoute/position/actualSpeed/surveillance,'/',
-                                                                message/flight/enRoute/position/altitude,'/',
-                                                                message/flight/enRoute/position/trackVelocity/x,'/',
-                                                                message/flight/enRoute/position/trackVelocity/y
-                                                        )"
-                              ns-prefix="ns5"
-                              ns-uri="http://www.faa.aero/nas/3.0" />
-
-    <int-xml:xpath-router id="fdpsPosition" input-channel="msg.scds.service"  evaluate-as-string="true" >
-        <int-xml:xpath-expression expression="boolean(ns5:MessageCollection/message/flight/enRoute/position)"
-                                  ns-prefix="ns5"
-                                  ns-uri="http://www.faa.aero/nas/3.0"
-        />
-        <int-xml:mapping value="true" channel="msg.scds.service.fdps.position" />
-        <int-xml:mapping value="false" channel="msg.scds.service.publishing" />
-    </int-xml:xpath-router>
-
-    <int:chain input-channel="msg.scds.service.fdps.position"
-               output-channel="msg.scds.service.publishing">
-        <int-xml:xpath-splitter>
-            <int-xml:xpath-expression expression="ns5:MessageCollection/message"
-                                      ns-prefix="ns5"
-                                      ns-uri="http://www.faa.aero/nas/3.0" />
-        </int-xml:xpath-splitter>
-
-        <int-xml:xpath-header-enricher>
-            <int-xml:header name="jms_destination"
-                            evaluation-type="STRING_RESULT"
-                            overwrite="true"
-                            xpath-expression-ref="fdpsTopic"/>
-        </int-xml:xpath-header-enricher>
-
-        <int-xml:xslt-transformer xsl-resource="classpath:fdps-json.xsl"  />
-
-    </int:chain>
-
 </beans:beans>
