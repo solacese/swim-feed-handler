@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.solace.swim</groupId>
 	<artifactId>swim-feed-handler</artifactId>
-	<version>1.1.2</version>
+	<version>1.1.4</version>
 	<name>swim-feed-handler</name>
 	<description>SWIM Feed Handler Spring Boot Application</description>
 
