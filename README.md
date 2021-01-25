@@ -217,7 +217,7 @@ tar zxvf swim-feed-handler-VERSION.tar.gz
 After deployment, run the application using the following command:
 
 ```shell script
-java -jar swim-feed-handler-VERSION.jar --spring.profiles.active=profile-name --spring.config.location=./config/
+java -Dspring.profiles.active=profile-name -Dspring.config.location=./config/ -jar swim-feed-handler-VERSION.jar 
 ```
 
 The value for `profile-name` is based on the which application properties file is desired to be loaded into the 
@@ -227,7 +227,7 @@ of the application, one for each SCDS dataset/Message VPN.  For example, to run 
 data, run:
 
  ```shell script
- java -jar swim-feed-handler-VERSION.jar --spring.profiles.active=stdds --spring.config.location=./config/
+ java -Dspring.profiles.active=stdds -Dspring.config.location=./config/ -jar swim-feed-handler-VERSION.jar
  ```
  
  This will invoke the properties found in the `config/application-stdds.properties` file.
@@ -249,10 +249,10 @@ data, run:
  execution.
  
  #### 3.2 Monitor
- Log entries are written to `log/system.log` that indicate current processing actions.  Basic information
+ Log entries are written to `log/system-${profile}.log` that indicate current processing actions.  Basic information
  is provided on execution and should be sufficient to indicate health of the application.  Additional
  debug messages may be turned on by modifying the root log level from `info` to `debug` in the
- `resources/logback.xml` log configuration file.
+ `resources/logback-spring.xml` log configuration file.
  
  ---
  
