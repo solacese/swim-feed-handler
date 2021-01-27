@@ -60,6 +60,11 @@ public class SolacePublishingService implements IService {
         Properties props = new Properties();
         props.putAll(envProducer);
         jcsmpProperties = JCSMPProperties.fromProperties(props);
+        // Set the retry to forever
+        JCSMPChannelProperties channelProperties = (JCSMPChannelProperties) jcsmpProperties.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
+        channelProperties.setConnectRetries(-1);
+        channelProperties.setReconnectRetries(-1);
+
         jcsmpSession = JCSMPFactory.onlyInstance().createSession(jcsmpProperties);
         producer = jcsmpSession.getMessageProducer(new JCSMPStreamingPublishEventHandler() {
             @Override
