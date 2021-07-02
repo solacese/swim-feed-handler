@@ -1,8 +1,8 @@
 package com.solace.swim.service;
 
-import java.util.Map;
+import org.springframework.messaging.Message;
 
 public interface IService {
 
-    public void invoke(Map<String, ?> messageHeaders, String messagePayload);
+    public void invoke(Message<?> message);
 }

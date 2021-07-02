@@ -21,13 +21,13 @@ package com.solace.swim.service.logging;
 
 import com.solace.swim.service.IService;
 import com.solace.swim.util.MessageUtil;
+import com.solacesystems.jms.message.SolMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @ConditionalOnProperty(prefix = "service.message-logging", value = "enabled", havingValue = "true")
@@ -41,11 +41,21 @@ public class MessageLoggingService implements IService {
 
 
     @Override
-    public void invoke(Map<String, ?> headers, String payload) {
+    public void invoke(Message<?> message) {
+        String payload;
+        if (message.getPayload() instanceof String) {
+            payload = (String)message.getPayload();
+        } else if (message.getPayload() instanceof SolMessage) {
+            SolMessage obj = (SolMessage) message.getPayload();
+            payload = obj.dump();
+        } else {
+            payload = message.getPayload().toString();
+        }
+
         StringBuilder builder = new StringBuilder();
         if (writeHeaders) {
             builder.append("<!--");
-            builder.append(MessageUtil.getHeadersAsJSON(headers));
+            builder.append(MessageUtil.getHeadersAsJSON(message.getHeaders()));
             builder.append("-->\n");
         }
         builder.append(payload);

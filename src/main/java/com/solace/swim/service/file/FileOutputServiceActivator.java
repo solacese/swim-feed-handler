@@ -53,7 +53,7 @@ public class FileOutputServiceActivator {
         } else if (msg.getPayload() instanceof Object) {
             payload = msg.getPayload().toString();
         }
-        service.invoke(msg.getHeaders(), payload);
+        service.invoke(msg);
         return;
     }
 

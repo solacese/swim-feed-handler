@@ -45,7 +45,7 @@ public class AWSS3PutServiceActivator implements IServiceActivator {
     @Async
     @Override
     public void processMessage(Message msg) {
-        service.invoke(msg.getHeaders(), (String)msg.getPayload());
+        service.invoke(msg);
         return;
     }
 }
