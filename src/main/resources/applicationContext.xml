@@ -5,7 +5,8 @@
              xmlns:context="http://www.springframework.org/schema/context"
              xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
              xmlns:int-file="http://www.springframework.org/schema/integration/file"
-             xsi:schemaLocation="http://www.springframework.org/schema/beans
+
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
 		https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context
 		https://www.springframework.org/schema/context/spring-context.xsd
@@ -40,11 +41,13 @@
         </int:interceptors>
     </int:channel>
 
+    <int:channel id="msg.scds.service.publishing" />
+
     <int:channel id="errorChannel">
         <int:queue capacity="100"/>
     </int:channel>
 
-    <int:logging-channel-adapter id="dlq-logging" expression="'Message '.concat(headers.get('id')).concat(' has been discarded.')" level="INFO"/>
+    <int:logging-channel-adapter id="dlq-logging" expression="'Message '.concat(headers.get('jms_messageId')).concat(' has been discarded.')" level="INFO"/>
 
     <int:publish-subscribe-channel id="msg.scds.service" task-executor="taskExecutor"/>
 

@@ -25,9 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @ConditionalOnProperty(prefix = "service.message-logging", value = "enabled", havingValue = "true")
@@ -41,14 +40,14 @@ public class MessageLoggingService implements IService {
 
 
     @Override
-    public void invoke(Map<String, ?> headers, String payload) {
+    public void invoke(Message<?> msg) {
         StringBuilder builder = new StringBuilder();
         if (writeHeaders) {
             builder.append("<!--");
-            builder.append(MessageUtil.getHeadersAsJSON(headers));
+            builder.append(MessageUtil.getHeadersAsJSON(msg.getHeaders()));
             builder.append("-->\n");
         }
-        builder.append(payload);
+        builder.append(msg.getPayload());
 
         logger.info(builder.toString());
     }

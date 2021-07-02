@@ -13,7 +13,6 @@ import javax.cache.annotation.CacheResult;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.Duration;
 import javax.cache.expiry.TouchedExpiryPolicy;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -29,21 +28,22 @@ public class SMESManager {
         @Override
         public void customize(CacheManager cacheManager)
         {
-            cacheManager.createCache("cache.stdds.smes", new MutableConfiguration<>()
+            cacheManager.createCache("cache.stdds.smes", new MutableConfiguration<String, String>()
                     .setExpiryPolicyFactory(TouchedExpiryPolicy.factoryOf(new Duration(MINUTES, 10)))
-                    .setStoreByValue(true)
+                    .setStoreByValue(false)
                     .setStatisticsEnabled(true));
         }
     }
 
     //@Cacheable(key = "#id", unless = "#result == null")
     @CacheResult ()
-    public ConcurrentHashMap<String, String> getObjectByTrackId(String id) {
+    public String getObjectByTrackId(String id) {
         return null;
     }
 
     @CachePut(cacheNames = "cache.stdds.smes", key = "#id")
-    public ConcurrentHashMap<String, String> insert(String id, ConcurrentHashMap<String, String> object) {
+    public String insert(String id, String object) {
+
         return object;
     }
 }

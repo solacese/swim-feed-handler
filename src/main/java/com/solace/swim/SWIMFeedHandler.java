@@ -75,7 +75,7 @@ public class SWIMFeedHandler {
 		//@JmsListener(id="queue2", destination = "${solace.jms.consumer.queue-name.2}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		public void handleMsg(Message<?> msg) {
 			// Print headers if DEBUG is turned on
-			logger.info("SCDS Message received...{}",msg.getHeaders().get("id"));
+			logger.info("SCDS Message received...{}",msg.getHeaders().get("jms_messageId"));
 			if (logger.isDebugEnabled()) {
 				logger.debug("Headers:\n");
 				logger.debug(MessageUtil.getHeaders(msg.getHeaders()));

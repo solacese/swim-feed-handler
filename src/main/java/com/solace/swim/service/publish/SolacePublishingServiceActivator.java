@@ -42,11 +42,18 @@ public class SolacePublishingServiceActivator implements IServiceActivator {
     @Autowired
     SolacePublishingService service;
 
-    @ServiceActivator (inputChannel = "msg.scds.service.publishing")
+    @ServiceActivator (inputChannel = "msg.scds.service")
     @Async
     @Override
-    public void processMessage(Message msg) {
-        service.invoke(msg.getHeaders(), (String)msg.getPayload());
+    public void processMessage(Message<?> msg) {
+        service.invoke(msg);
+        return;
+    }
+
+    @ServiceActivator (inputChannel = "msg.scds.service.publishing")
+    @Async
+    public void processPublishMessage(Message<?> msg) {
+        service.invoke(msg);
         return;
     }
 

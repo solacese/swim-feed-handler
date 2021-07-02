@@ -93,7 +93,7 @@ public class MessageLoggingServiceActivator implements IServiceActivator {
         } else {
             payload = msg.getPayload().toString();
         }
-        service.invoke(msg.getHeaders(), payload);
+        service.invoke(msg);
     }
 
 

@@ -31,12 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * Service class designed to write a String object to an AWS S3 store.  The current time in
@@ -115,18 +115,18 @@ public class AWSS3PutService implements IService {
 
 
         @Override
-    public void invoke(Map<String, ?> headers, String payload) {
+    public void invoke(Message<?> msg) {
         try {
             logger.info("Message received. Attempting to store to AWS S3...");
-            Object id = (headers.get("id")!=null)?headers.get("id"):Long.toString(System.currentTimeMillis());
+            Object id = (msg.getHeaders().get("id")!=null)?msg.getHeaders().get("id"):Long.toString(System.currentTimeMillis());
             String name = folderName + id.toString();
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(payload.length());
+            metadata.setContentLength(((String)msg.getPayload()).length());
             s3Client.putObject(
                     new PutObjectRequest(
                             bucketName,
                             name,
-                            new ByteArrayInputStream( payload.getBytes() ),
+                            new ByteArrayInputStream( ((String)msg.getPayload()).getBytes() ),
                             metadata
                     )
             );

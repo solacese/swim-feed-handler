@@ -16,6 +16,10 @@
         http://www.springframework.org/schema/integration/file
         https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
 
+    <beans:bean id="fdpsDestinationResolver" class="com.solace.swim.util.DestinationResolver">
+        <beans:constructor-arg type="String" value="fdps-json-topic.xsl"/>
+    </beans:bean>
+
     <int-xml:xpath-expression id="fdpsTopic" expression="concat('FDPS/position/',
                                                                 message/flight/flightPlan/@identifier,'/',
                                                                 message/flight/flightStatus/@fdpsFlightStatus,'/',
@@ -30,21 +34,7 @@
                               ns-prefix="ns5"
                               ns-uri="http://www.faa.aero/nas/3.0" />
 
-    <!--<int:header-value-router input-channel="msg.scds.service" header-name="FDPS_MessageType" default-output-channel="nullChannel" resolution-required="false">
-        <int:mapping value="BATCH_TH_FIXM" channel="msg.scds.service.fdps"/>
-        <int:mapping value="TH_FIXM" channel="msg.scds.service.fdps"/>
-    </int:header-value-router>-->
-
-    <int:filter input-channel="msg.scds.service" output-channel="msg.scds.service.fdps.position" expression="headers.containsKey('FDPS_MessageType')?headers.get('FDPS_MessageType').contains('TH_FIXM'):'false'" discard-channel="dlq-logging" />
-
-    <!--<int-xml:xpath-router id="fdpsPosition" input-channel="msg.scds.service.fdps"  evaluate-as-string="true" >
-        <int-xml:xpath-expression expression="boolean(ns5:MessageCollection/message/flight/enRoute/position)"
-                                  ns-prefix="ns5"
-                                  ns-uri="http://www.faa.aero/nas/3.0"
-        />
-        <int-xml:mapping value="true" channel="msg.scds.service.fdps.position" />
-        <int-xml:mapping value="false" channel="nullChannel" />
-    </int-xml:xpath-router>-->
+    <int:filter id="fdpsMsgFilter" input-channel="msg.scds.service" output-channel="msg.scds.service.fdps.position" expression="headers.containsKey('FDPS_MessageType')?headers.get('FDPS_MessageType').contains('TH_FIXM'):'false'" discard-channel="dlq-logging" />
 
     <int:chain input-channel="msg.scds.service.fdps.position"
                output-channel="msg.scds.service.publishing">
@@ -54,14 +44,11 @@
                                       ns-uri="http://www.faa.aero/nas/3.0" />
         </int-xml:xpath-splitter>
 
-        <int-xml:xpath-header-enricher>
-            <int-xml:header name="jms_destination"
-                            evaluation-type="STRING_RESULT"
-                            overwrite="true"
-                            xpath-expression-ref="fdpsTopic"/>
-        </int-xml:xpath-header-enricher>
+        <int:header-enricher>
+            <int:header name="jms_destination" overwrite="true" ref="fdpsDestinationResolver" method="computeDestination"/>
+        </int:header-enricher>
 
-        <int-xml:xslt-transformer xsl-resource="classpath:fdps-json.xsl"  />
+        <int-xml:xslt-transformer xsl-resource="classpath:xml-to-json.xsl"  />
 
     </int:chain>
 

@@ -43,7 +43,7 @@ public class FileOutputServiceActivator {
 
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
-    public void processMessage(Message msg) {
+    public void processMessage(Message<?> msg) {
         String payload = "";
         if (msg.getPayload() instanceof String) {
             payload = (String)msg.getPayload();
@@ -53,7 +53,7 @@ public class FileOutputServiceActivator {
         } else if (msg.getPayload() instanceof Object) {
             payload = msg.getPayload().toString();
         }
-        service.invoke(msg.getHeaders(), payload);
+        service.invoke(msg);
         return;
     }
 

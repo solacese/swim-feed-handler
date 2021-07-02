@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -32,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
 /**
  * Service class designed to write data to disk.  The payload of the message will be written as a file.
@@ -68,15 +68,15 @@ public class FileOutputService implements IService {
     }
 
     @Override
-    public void invoke(Map<String, ?> headers, String payload) {
+    public void invoke(Message<?> msg) {
         logger.info("File being written...");
-        String filename = MessageUtil.getHeaderValue(headers, "id") ;
+        String filename = MessageUtil.getHeaderValue(msg.getHeaders(), "id") ;
 
         if (writeHeaders) {
             File header = new File(outputDirectory + File.separator + filename + ".header");
 
             try (FileOutputStream stream = new FileOutputStream(header)) {
-                stream.write(MessageUtil.getHeaders(headers).getBytes());
+                stream.write(MessageUtil.getHeaders(msg.getHeaders()).getBytes());
             } catch (FileNotFoundException e) {
                 logger.error("File not found", e);
             } catch (IOException e) {
@@ -86,7 +86,7 @@ public class FileOutputService implements IService {
 
         File file = new File(outputDirectory + File.separator + filename);
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            stream.write(payload.getBytes());
+            stream.write(((String)msg.getPayload()).getBytes());
         } catch (FileNotFoundException e) {
             logger.error("File not found", e);
         } catch (IOException e) {

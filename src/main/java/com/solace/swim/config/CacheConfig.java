@@ -8,6 +8,6 @@ import org.springframework.context.annotation.ImportResource;
 @Configuration
 @EnableCaching
 @ImportResource({"classpath*:stddsToJsonContext.xml"})
-public class CacheConfig  {
+public class CacheConfig {
 
 }

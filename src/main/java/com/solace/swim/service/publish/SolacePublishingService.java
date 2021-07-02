@@ -23,14 +23,15 @@ import com.solacesystems.jcsmp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.messaging.converter.SimpleMessageConverter;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -55,11 +56,17 @@ public class SolacePublishingService implements IService {
     private JCSMPSession jcsmpSession;
     private XMLMessageProducer producer;
 
+    @Value("${service.solace-publishing.compressionLevel:0}")
+    private int compressionLevel;
+
     @PostConstruct
     private void init() throws Exception {
         Properties props = new Properties();
         props.putAll(envProducer);
         jcsmpProperties = JCSMPProperties.fromProperties(props);
+        JCSMPChannelProperties channelProps = new JCSMPChannelProperties();
+        channelProps.setCompressionLevel(compressionLevel);
+        jcsmpProperties.setProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES, channelProps);
         jcsmpSession = JCSMPFactory.onlyInstance().createSession(jcsmpProperties);
         producer = jcsmpSession.getMessageProducer(new JCSMPStreamingPublishEventHandler() {
             @Override
@@ -76,39 +83,78 @@ public class SolacePublishingService implements IService {
     }
 
     @Override
-    public void invoke(Map<String, ?> headers, String payload) {
+    public void invoke(Message<?> message) {
         try {
-            MessageConverter messageConverter = new SimpleMessageConverter();
+            XMLMessage xmlMessage;
+            Object payload = message.getPayload();
+            if (payload instanceof byte[]) {
+                BytesMessage bytesMessage = JCSMPFactory.onlyInstance().createMessage(BytesMessage.class);
+                bytesMessage.setData((byte[]) payload);
+                xmlMessage = bytesMessage;
+            } else if (payload instanceof String) {
+                TextMessage textMessage = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
+                textMessage.setText((String) payload);
+                xmlMessage = textMessage;
+            } else if (payload instanceof SDTStream) {
+                StreamMessage streamMessage = JCSMPFactory.onlyInstance().createMessage(StreamMessage.class);
+                streamMessage.setStream((SDTStream) payload);
+                xmlMessage = streamMessage;
+            } else if (payload instanceof SDTMap) {
+                MapMessage mapMessage = JCSMPFactory.onlyInstance().createMessage(MapMessage.class);
+                mapMessage.setMap((SDTMap) payload);
+                xmlMessage = mapMessage;
+            } else if (payload instanceof Serializable) {
+                BytesMessage bytesMessage = JCSMPFactory.onlyInstance().createMessage(BytesMessage.class);
+                bytesMessage.setData((byte[]) payload);
+                xmlMessage = bytesMessage;
+            } else {
+                String msg = String.format(
+                        "Invalid payload received. Expected %s. Received: %s",
+                        String.join(", ",
+                                byte[].class.getSimpleName(),
+                                String.class.getSimpleName(),
+                                SDTStream.class.getSimpleName(),
+                                SDTMap.class.getSimpleName(),
+                                Serializable.class.getSimpleName()
+                        ), payload.getClass().getName());
+                MessageConversionException exception = new MessageConversionException(msg);
+                logger.warn(msg, exception);
+                throw exception;
+            }
+
+            SDTMap properties = JCSMPFactory.onlyInstance().createMap();
+            for (String header : message.getHeaders().keySet()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(header + "=" + message.getHeaders().get(header));
+                }
+                Object value = message.getHeaders().get(header);
+                try {
+                    properties.putObject(header, message.getHeaders().get(header));
+                } catch (IllegalArgumentException e) {
+                    logger.warn("{}. Converting header {} to String", e.getMessage(),message.getHeaders().get(header).toString());
+                    properties.putString(header, message.getHeaders().get(header).toString());
+                }
+            }
 
             javax.jms.Topic jmsTopic = null;
             com.solacesystems.jcsmp.Topic topic = null;
             try {
-                jmsTopic = (javax.jms.Topic)headers.get("jms_destination");
+                jmsTopic = (javax.jms.Topic)message.getHeaders().get("jms_destination");
                 topic = JCSMPFactory.onlyInstance().createTopic(jmsTopic.getTopicName());
             } catch (ClassCastException e) {
-                String jmsDestination = (String) headers.get("jms_destination");
-                topic = JCSMPFactory.onlyInstance().createTopic(jmsDestination);
+                //String jmsDestination = (String) message.getHeaders().get("jms_destination");
+                Object jmsDestination = message.getHeaders().get("jms_destination");
+                topic = JCSMPFactory.onlyInstance().createTopic(jmsDestination.toString());
             }
 
-            //XMLContentMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(XMLContentMessage.class);
-            TextMessage jcsmpMsg = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
-            SDTMap properties = JCSMPFactory.onlyInstance().createMap();
+            xmlMessage.setDeliveryMode(DeliveryMode.PERSISTENT);
+            xmlMessage.setProperties(properties);
 
-            for (String header : headers.keySet()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(header + "=" + headers.get(header));
-                }
-                properties.putString(header, headers.get(header).toString());
-            }
-            jcsmpMsg.setText(payload);
-            jcsmpMsg.setDeliveryMode(DeliveryMode.DIRECT);
-            jcsmpMsg.setProperties(properties);
-
-            producer.send(jcsmpMsg, topic);
+            producer.send(xmlMessage, topic);
 
             properties = null;
-            jcsmpMsg = null;
-            logger.info("Published message to {}.", topic);
+            xmlMessage = null;
+            logger.info("Published message id {} to topic {}.", message.getHeaders().get("jms_messageId"), topic);
         } catch (Exception ex) {
             logger.error("Unable to send message", ex);
         }
