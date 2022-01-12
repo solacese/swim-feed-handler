@@ -67,7 +67,7 @@ solace.jms.consumer.client-username=[username]]  (SCDS property: Connection User
 solace.jms.consumer.client-password=[password] (SCDS property: Connection Password)
 solace.jms.consumer.connection-factory=[connection-factory]  (SCDS property: Connection Factory i.e. usually in format of username.CF)
 
-solace.jms.consumer.queue-name.0=[queue-name]  (SCDS property: Queue Name i.e. format of username.MESSAGE_VPN.UUID.OUT)
+solace.jms.consumer.destination-name.0=[queue-name]  (SCDS property: Queue Name i.e. format of username.MESSAGE_VPN.UUID.OUT)
 ```
 Sometimes it will be necessary to create multiple connections to a single Message VPN to connect
 to multiple queues due to data rates or specific filter needs.  For example, the STDDS data rate 
@@ -79,11 +79,11 @@ The application.properties file can support multiple queue configurations.  Simp
 index for the Queue name property.  The following is an example of multiple queues from the same 
 VPN.
 ```properties
-solace.jms.consumer.queue-name.0=[queue 1 name]
-solace.jms.consumer.queue-name.1=[queue 2 name]
-solace.jms.consumer.queue-name.2=[queue 3 name]
+solace.jms.consumer.destination-name.0=[queue 1 name]
+solace.jms.consumer.destination-name.1=[queue 2 name]
+solace.jms.consumer.destination-name.2=[queue 3 name]
 ...
-solace.jms.consumer.queue-name.n=[queue n+1 name]
+solace.jms.consumer.destination-name.n=[queue n+1 name]
 ```
 The consumer code is multi-threaded.  The property `solace.jms.consumer.maxListeners` provides
 a mechanism to limit the number of threads that are dedicated to consuming messages from the SCDS
@@ -92,6 +92,21 @@ default values and should be sufficient for most of the SCDS flows.  Your specif
 warrant increase in this values.  This will likely be a trial
 and error scenario.  Monitor to the SCDS metric of expired messages to determine if the value
 should increase or decrease.
+
+##### 1.1.1 Support for Queues or Topics
+The JMS consumer code can be used to connect to either type of JMS destinations, queues or topics.
+The consumer will connect to queues by default.  To enable the ability to connect to a topic or multiple
+topics, set the `solace.jms.consumer.pubSub` property to `true`.
+
+For queues (default value)
+```properties
+solace.jms.consumer.pubSub=false
+```
+
+For topics
+```properties
+solace.jms.consumer.pubSub=true
+```
 
 #### 1.2 Service configuration
 There are various message handling services that are provided.  Each service has a unique function and 
@@ -158,15 +173,15 @@ of the logging command that rolls over the file every hour.  You can modify the 
  and the format of the logged message, if desired.  Refer to Logback's documentation for syntax.
 ```xml
 <appender name="hourlyRolloverLogger" class="ch.qos.logback.core.rolling.RollingFileAppender" >
-        <file>${basePath}/messages-${spring.profiles.active}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${basePath}/messages-${spring.profiles.active}.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
-        </rollingPolicy>
-        <param name="Append" value="false" />
-        <encoder>
-            <pattern>%msg%n</pattern>
-        </encoder>
-    </appender>
+    <file>${basePath}/messages-${spring.profiles.active}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${basePath}/messages-${spring.profiles.active}.%d{yyyy-MM-dd_HH, UTC}Z.zip</fileNamePattern>
+    </rollingPolicy>
+    <param name="Append" value="false" />
+    <encoder>
+        <pattern>%msg%n</pattern>
+    </encoder>
+</appender>
 ```
 If modified, you will need to build, package and deploy the application once again.  Refer to Section 2.
 
@@ -198,7 +213,7 @@ the consumption rate.  By linking the consumer and the null op service together,
 Build the project from source using Maven.
 
 ```shell script
-mvnw clean package
+./mvnw clean package
 ```
 
 Upon successful completion, a compressed tar file (`swim-feed-handler-VERSION.tar.gz`) will be generated in the 
@@ -236,7 +251,7 @@ data, run:
  The application may also be run from the development environment using Maven.  After
  
  ```shell script
- mvnw spring-boot:run -Dspring-boot.run.profiles=profile_name
+ ./mvnw spring-boot:run -Dspring-boot.run.profiles=profile_name
  ```
  
  ##### 3.1.3 From IDE

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -18,8 +18,18 @@
  */
 package com.solace.swim.service.publish;
 
+import com.solace.messaging.MessagingService;
+import com.solace.messaging.config.SolaceProperties;
+import com.solace.messaging.config.profile.ConfigurationProfile;
+import com.solace.messaging.publisher.OutboundMessage;
+import com.solace.messaging.publisher.OutboundMessageBuilder;
+import com.solace.messaging.publisher.PersistentMessagePublisher;
+import com.solace.messaging.resources.Topic;
+import com.solace.messaging.util.SolaceSDTMap;
+import com.solace.messaging.util.SolaceSDTMapToMessageConverter;
 import com.solace.swim.service.IService;
-import com.solacesystems.jcsmp.*;
+import com.solacesystems.jcsmp.SDTMap;
+import com.solacesystems.jcsmp.SDTStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +39,10 @@ import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.jms.JMSException;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -47,64 +61,76 @@ public class SolacePublishingService implements IService {
     private static final Logger logger = LoggerFactory.getLogger(SolacePublishingService.class);
 
     @Autowired
-    Hashtable envProducer;
+    Hashtable<String,String> envProducer;
 
-    private JCSMPFactory solaceFactory;
+    // New Solace Java API messaging service
+    private MessagingService messagingService;
 
-    private JCSMPProperties jcsmpProperties;
-    private JCSMPSession jcsmpSession;
-    private XMLMessageProducer producer;
+    // New Solace Java API messaging publisher
+    private PersistentMessagePublisher messagePublisher;
 
     @PostConstruct
-    private void init() throws Exception {
+    private void init() {
         Properties props = new Properties();
         props.putAll(envProducer);
-        jcsmpProperties = JCSMPProperties.fromProperties(props);
-        // Set the retry to forever
-        JCSMPChannelProperties channelProperties = (JCSMPChannelProperties) jcsmpProperties.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
-        channelProperties.setConnectRetries(-1);
-        channelProperties.setReconnectRetries(-1);
+        props.setProperty(SolaceProperties.TransportLayerProperties.RECONNECTION_ATTEMPTS, "-1");
+        props.setProperty(SolaceProperties.TransportLayerProperties.CONNECTION_RETRIES, "-1");
 
-        jcsmpSession = JCSMPFactory.onlyInstance().createSession(jcsmpProperties);
-        producer = jcsmpSession.getMessageProducer(new JCSMPStreamingPublishEventHandler() {
-            @Override
-            public void handleError(String s, JCSMPException e, long l) {
-                logger.error(s,e);
-            }
+        messagingService = MessagingService.builder(ConfigurationProfile.V1).fromProperties(props).build();
+        messagingService.connect();
 
-            @Override
-            public void responseReceived(String s) {
-                //do nothing
-            }
+        messagingService.addServiceInterruptionListener(serviceEvent -> {
+            logger.error("### SERVICE INTERRUPTION: "+serviceEvent.getCause());
         });
-        jcsmpSession.connect();
+        messagingService.addReconnectionAttemptListener(serviceEvent -> {
+            logger.info("### RECONNECTING ATTEMPT: "+serviceEvent);
+        });
+        messagingService.addReconnectionListener(serviceEvent -> {
+            logger.info("### RECONNECTED: "+serviceEvent);
+        });
+
+        messagePublisher = messagingService.createPersistentMessagePublisherBuilder()
+                .build()
+                .start();
+
+        final PersistentMessagePublisher.MessagePublishReceiptListener deliveryConfirmationListener = (publishReceipt) -> {
+            // process delivery confirmation for some message ...
+        };
+
+        messagePublisher.setMessagePublishReceiptListener(deliveryConfirmationListener);
     }
 
     @Override
     public void invoke(Message<?> message) {
+        OutboundMessageBuilder messageBuilder = messagingService.messageBuilder();
+
+        OutboundMessage outboundMessage;
+
+        // Copy the message properties
+        Properties properties = new Properties();
+        properties.putAll(message.getHeaders());
+
         try {
-            XMLMessage xmlMessage;
-            Object payload = message.getPayload();
-            if (payload instanceof byte[]) {
-                BytesMessage bytesMessage = JCSMPFactory.onlyInstance().createMessage(BytesMessage.class);
-                bytesMessage.setData((byte[]) payload);
-                xmlMessage = bytesMessage;
-            } else if (payload instanceof String) {
-                TextMessage textMessage = JCSMPFactory.onlyInstance().createMessage(TextMessage.class);
-                textMessage.setText((String) payload);
-                xmlMessage = textMessage;
-            } else if (payload instanceof SDTStream) {
-                StreamMessage streamMessage = JCSMPFactory.onlyInstance().createMessage(StreamMessage.class);
-                streamMessage.setStream((SDTStream) payload);
-                xmlMessage = streamMessage;
-            } else if (payload instanceof SDTMap) {
-                MapMessage mapMessage = JCSMPFactory.onlyInstance().createMessage(MapMessage.class);
-                mapMessage.setMap((SDTMap) payload);
-                xmlMessage = mapMessage;
-            } else if (payload instanceof Serializable) {
-                BytesMessage bytesMessage = JCSMPFactory.onlyInstance().createMessage(BytesMessage.class);
-                bytesMessage.setData((byte[]) payload);
-                xmlMessage = bytesMessage;
+            Object incomingPayload = message.getPayload();
+            if (incomingPayload instanceof byte[]) {
+                outboundMessage = messageBuilder.build((byte[]) message.getPayload(), properties);
+            } else if (incomingPayload instanceof String) {
+                outboundMessage = messageBuilder.build((String)message.getPayload(), properties);
+            } else if (incomingPayload instanceof SDTStream) {
+                outboundMessage = messageBuilder.build(((SDTStream)incomingPayload).readBytes(), properties);
+            } else if (incomingPayload instanceof SDTMap) {
+                SolaceSDTMap content = new SolaceSDTMap();
+                content.putAll((SDTMap)incomingPayload);
+                outboundMessage = messageBuilder.build(content, new SolaceSDTMapToMessageConverter());
+            } else if (incomingPayload instanceof Serializable) {
+                ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
+
+                objectOutputStream.writeObject(incomingPayload);
+                objectOutputStream.flush();
+                objectOutputStream.close();
+
+                outboundMessage = messageBuilder.build(byteOutputStream.toByteArray(), properties);
             } else {
                 String msg = String.format(
                         "Invalid payload received. Expected %s. Received: %s",
@@ -114,47 +140,42 @@ public class SolacePublishingService implements IService {
                                 SDTStream.class.getSimpleName(),
                                 SDTMap.class.getSimpleName(),
                                 Serializable.class.getSimpleName()
-                        ), payload.getClass().getName());
+                        ), incomingPayload.getClass().getName());
                 MessageConversionException exception = new MessageConversionException(msg);
-                logger.warn(msg, exception);
+                logger.error(msg, exception);
                 throw exception;
             }
 
-            SDTMap properties = JCSMPFactory.onlyInstance().createMap();
-            for (String header : message.getHeaders().keySet()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(header + "=" + message.getHeaders().get(header));
-                }
-                Object value = message.getHeaders().get(header);
-                try {
-                    properties.putObject(header, message.getHeaders().get(header));
-                } catch (IllegalArgumentException e) {
-                    logger.warn("{}. Converting header {} to String", e.getMessage(),message.getHeaders().get(header).toString());
-                    properties.putString(header, message.getHeaders().get(header).toString());
-                }
-            }
+            javax.jms.Topic jmsTopic;
+            Topic topic;
 
-            javax.jms.Topic jmsTopic = null;
-            com.solacesystems.jcsmp.Topic topic = null;
             try {
                 jmsTopic = (javax.jms.Topic)message.getHeaders().get("jms_destination");
-                topic = JCSMPFactory.onlyInstance().createTopic(jmsTopic.getTopicName());
-            } catch (ClassCastException e) {
-                //String jmsDestination = (String) message.getHeaders().get("jms_destination");
+                assert jmsTopic != null;
+                topic = Topic.of(jmsTopic.getTopicName());
+            } catch (ClassCastException | JMSException | AssertionError e) {
                 Object jmsDestination = message.getHeaders().get("jms_destination");
-                topic = JCSMPFactory.onlyInstance().createTopic(jmsDestination.toString());
+                assert jmsDestination != null;
+                topic = Topic.of(jmsDestination.toString());
             }
 
-            xmlMessage.setDeliveryMode(DeliveryMode.PERSISTENT);
-            xmlMessage.setProperties(properties);
-
-            producer.send(xmlMessage, topic);
+            messagePublisher.publish(outboundMessage, topic);
 
             properties = null;
-            xmlMessage = null;
-            logger.info("Published message id {} to topic {}.", message.getHeaders().get("jms_messageId"), topic);
+            logger.info("Published message id {} to topic {}.", message.getHeaders().get("jms_messageId"), topic.getName());
         } catch (Exception ex) {
             logger.error("Unable to send message", ex);
+        }
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        if (!messagePublisher.isTerminated()) {
+            messagePublisher.terminate(0L);
+        }
+
+        if (messagingService.isConnected()) {
+            messagingService.disconnect();
         }
     }
 }

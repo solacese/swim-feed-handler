@@ -70,9 +70,9 @@ public class SWIMFeedHandler {
 
 		// Repeatable annotations are supported by spring to allow connections to multiple destinations
 		// Duplicate the @JMSListener annotation and modify the id and destination
-		@JmsListener(id="queue0", destination = "${solace.jms.consumer.queue-name.0}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
-		//@JmsListener(id="queue1", destination = "${solace.jms.consumer.queue-name.1}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
-		//@JmsListener(id="queue2", destination = "${solace.jms.consumer.queue-name.2}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
+		@JmsListener(id="queue0", destination = "${solace.jms.consumer.destination-name.0}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
+		//@JmsListener(id="queue1", destination = "${solace.jms.consumer.destination-name.1}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
+		//@JmsListener(id="queue2", destination = "${solace.jms.consumer.destination-name.2}", containerFactory = "cFactory", concurrency = "${solace.jms.consumer.max-listeners}")
 		public void handleMsg(Message<?> msg) {
 			// Print headers if DEBUG is turned on
 			if (logger.isDebugEnabled()) {

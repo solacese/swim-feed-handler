@@ -15,11 +15,11 @@
     <beans:bean id="envProducer" class="java.util.Hashtable">
         <beans:constructor-arg>
             <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
-                <beans:entry key="jcsmp.HOST" value="${service.solace-publishing.host}"/>
-                <beans:entry key="jcsmp.VPN_NAME" value="${service.solace-publishing.msg-vpn}"/>
-                <beans:entry key="jcsmp.USERNAME" value="${service.solace-publishing.client-username}"/>
-                <beans:entry key="jcsmp.PASSWORD" value="#{environment['service.solace-publishing.client-password']}"/>
-                <beans:entry key="jcsmp.PUB_ACK_WINDOW_SIZE" value="255"/>
+                <beans:entry key="solace.messaging.transport.host" value="${service.solace-publishing.host}"/>
+                <beans:entry key="solace.messaging.service.vpn-name" value="${service.solace-publishing.msg-vpn}"/>
+                <beans:entry key="solace.messaging.authentication.basic.username" value="${service.solace-publishing.client-username}"/>
+                <beans:entry key="solace.messaging.authentication.basic.password" value="#{environment['service.solace-publishing.client-password']}"/>
+                <beans:entry key="solace.messaging.service.publishers.persistent.ack-window-size" value="255"/>
             </beans:map>
         </beans:constructor-arg>
 

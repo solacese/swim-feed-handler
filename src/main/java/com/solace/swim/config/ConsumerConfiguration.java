@@ -57,6 +57,10 @@ public class ConsumerConfiguration {
     @Value("${solace.jms.consumer.connection-factory}")
     private String consumerConnectionFactoryName;
 
+    //Tells system to connect to a queue (by default) or a topic (pubsub)
+    @Value("${solace.jms.consumer.pubSub:false}")
+    boolean pubSubDomain;
+
     /**
      * Initialize the InitialConext based on the environment properties that is autowired via Spring.
      * @throws NamingException
@@ -78,6 +82,7 @@ public class ConsumerConfiguration {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
+        factory.setPubSubDomain(pubSubDomain);
         return factory;
     }
 
