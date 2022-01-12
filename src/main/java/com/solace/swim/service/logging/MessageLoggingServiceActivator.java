@@ -20,7 +20,6 @@ package com.solace.swim.service.logging;
 
 
 import com.solace.swim.service.IServiceActivator;
-import com.solacesystems.jms.message.SolMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,15 +83,7 @@ public class MessageLoggingServiceActivator implements IServiceActivator {
     @ServiceActivator(inputChannel = "msg.scds.service.log-message")
     @Async
     public void processMessage(Message<?> msg) {
-        String payload;
-        if (msg.getPayload() instanceof String) {
-            payload = (String)msg.getPayload();
-        } else if (msg.getPayload() instanceof SolMessage) {
-            SolMessage obj = (SolMessage) msg.getPayload();
-            payload = obj.dump();
-        } else {
-            payload = msg.getPayload().toString();
-        }
+
         service.invoke(msg);
     }
 

@@ -20,6 +20,7 @@ package com.solace.swim.service.file;
 
 import com.solace.swim.service.IService;
 import com.solace.swim.util.MessageUtil;
+import com.solacesystems.jms.message.SolMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * Service class designed to write data to disk.  The payload of the message will be written as a file.
@@ -68,15 +70,15 @@ public class FileOutputService implements IService {
     }
 
     @Override
-    public void invoke(Message<?> msg) {
+    public void invoke(Message<?> message) {
         logger.info("File being written...");
-        String filename = MessageUtil.getHeaderValue(msg.getHeaders(), "id") ;
+        String filename = MessageUtil.getHeaderValue(message.getHeaders(), "id") ;
 
         if (writeHeaders) {
             File header = new File(outputDirectory + File.separator + filename + ".header");
 
             try (FileOutputStream stream = new FileOutputStream(header)) {
-                stream.write(MessageUtil.getHeaders(msg.getHeaders()).getBytes());
+                stream.write(MessageUtil.getHeaders(message.getHeaders()).getBytes());
             } catch (FileNotFoundException e) {
                 logger.error("File not found", e);
             } catch (IOException e) {
@@ -84,9 +86,19 @@ public class FileOutputService implements IService {
             }
         }
 
+        String payload = "";
+        if (message.getPayload() instanceof String) {
+            payload = (String)message.getPayload();
+        } else if (message.getPayload() instanceof SolMessage) {
+            SolMessage obj = (SolMessage) message.getPayload();
+            payload = obj.dump();
+        } else if (message.getPayload() instanceof Object) {
+            payload = message.getPayload().toString();
+        }
+
         File file = new File(outputDirectory + File.separator + filename);
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            stream.write(((String)msg.getPayload()).getBytes());
+            stream.write(payload.getBytes());
         } catch (FileNotFoundException e) {
             logger.error("File not found", e);
         } catch (IOException e) {

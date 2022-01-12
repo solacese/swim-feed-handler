@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.5</version>
+		<version>2.6.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.solace.swim</groupId>
@@ -32,21 +32,19 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-xml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.integration</groupId>
-			<artifactId>spring-integration-file</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.solace.spring.boot</groupId>
 			<artifactId>solace-jms-spring-boot-starter</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.solace</groupId>
+			<artifactId>solace-messaging-client</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.solacesystems</groupId>
+			<artifactId>sol-jms</artifactId>
+			<version>10.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.cache</groupId>
@@ -55,12 +53,12 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.11.699</version>
+			<version>1.12.135</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>
 			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>3.0.2</version>
+			<version>3.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -101,7 +99,7 @@
 		<dependency>
 			<groupId>io.findify</groupId>
 			<artifactId>s3mock_2.12</artifactId>
-			<version>0.2.5</version>
+			<version>0.2.6</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -121,7 +119,6 @@
 			<artifactId>spring-integration-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -130,11 +127,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<folders>
-						<folder>
-							config/
-						</folder>
-					</folders>
+					<directories>
+						<directory>config/</directory>
+					</directories>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -145,7 +140,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.1.0</version><!--$NO-MVN-MAN-VER$-->
+				<version>3.3.0</version>
 				<executions>
 					<execution>
 						<id>dist</id>
@@ -165,7 +160,7 @@
 			<plugin>
 				<groupId>com.github.ulisesbocchio</groupId>
 				<artifactId>jasypt-maven-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.4</version>
 			</plugin>
 		</plugins>
 	</build>

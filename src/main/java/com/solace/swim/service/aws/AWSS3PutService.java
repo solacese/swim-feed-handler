@@ -114,19 +114,19 @@ public class AWSS3PutService implements IService {
     }
 
 
-        @Override
-    public void invoke(Message<?> msg) {
+    @Override
+    public void invoke(Message<?> message) {
         try {
             logger.info("Message received. Attempting to store to AWS S3...");
-            Object id = (msg.getHeaders().get("id")!=null)?msg.getHeaders().get("id"):Long.toString(System.currentTimeMillis());
+            Object id = (message.getHeaders().get("id")!=null)?message.getHeaders().get("id"):Long.toString(System.currentTimeMillis());
             String name = folderName + id.toString();
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(((String)msg.getPayload()).length());
+            metadata.setContentLength(((String)message.getPayload()).length());
             s3Client.putObject(
                     new PutObjectRequest(
                             bucketName,
                             name,
-                            new ByteArrayInputStream( ((String)msg.getPayload()).getBytes() ),
+                            new ByteArrayInputStream( ((String)message.getPayload()).getBytes() ),
                             metadata
                     )
             );

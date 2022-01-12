@@ -44,7 +44,7 @@ public class AWSS3PutServiceActivator implements IServiceActivator {
     @ServiceActivator(inputChannel = "msg.scds.service")
     @Async
     @Override
-    public void processMessage(Message<?> msg) {
+    public void processMessage(Message msg) {
         service.invoke(msg);
         return;
     }

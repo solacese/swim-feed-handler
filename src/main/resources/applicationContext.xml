@@ -19,6 +19,19 @@
 
     <context:annotation-config />
 
+    <beans:bean id="envProducer" class="java.util.Hashtable">
+        <beans:constructor-arg>
+            <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
+                <beans:entry key="solace.messaging.transport.host" value="${service.solace-publishing.host}"/>
+                <beans:entry key="solace.messaging.service.vpn-name" value="${service.solace-publishing.msg-vpn}"/>
+                <beans:entry key="solace.messaging.authentication.basic.username" value="${service.solace-publishing.client-username}"/>
+                <beans:entry key="solace.messaging.authentication.basic.password" value="#{environment['service.solace-publishing.client-password']}"/>
+                <beans:entry key="solace.messaging.service.publishers.persistent.ack-window-size" value="255"/>
+            </beans:map>
+        </beans:constructor-arg>
+
+    </beans:bean>
+
     <beans:bean id="envConsumer" class="java.util.Hashtable">
         <beans:constructor-arg>
             <beans:map key-type="java.lang.Object" value-type="java.lang.String">

@@ -13,7 +13,7 @@ public class NullOpService implements IService {
     private static final Logger logger = LoggerFactory.getLogger(NullOpService.class);
 
     @Override
-    public void invoke(Message<?> msg) {
+    public void invoke(Message<?> message) {
         // Do nothing
     }
 }
