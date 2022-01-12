@@ -75,13 +75,13 @@ is one of the highest data rates provided by SCDS.  It may be necessary to separ
 different subscriptions with different filters, thus creating multiple subscriptions and an 
 associated queue.
 
-The application.properties file can support multiple queue configurations.  Simply use a zero based
-index for the Queue name property.  The following is an example of multiple queues from the same 
+The application.properties file can support multiple queue/topic configurations.  Simply use a zero based
+index for the Queue name property.  The following is an example of multiple queues or topics from the same 
 VPN.
 ```properties
-solace.jms.consumer.destination-name.0=[queue 1 name]
-solace.jms.consumer.destination-name.1=[queue 2 name]
-solace.jms.consumer.destination-name.2=[queue 3 name]
+solace.jms.consumer.destination-name.0=[queue/topic 1 name]
+solace.jms.consumer.destination-name.1=[queue/topic 2 name]
+solace.jms.consumer.destination-name.2=[queue/topic 3 name]
 ...
 solace.jms.consumer.destination-name.n=[queue n+1 name]
 ```
