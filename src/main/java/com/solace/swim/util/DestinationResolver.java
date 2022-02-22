@@ -44,7 +44,7 @@ public class DestinationResolver implements Serializable {
 
     public String computeDestination(String payload) {
         if (logger.isDebugEnabled()) {
-            logger.info("Entering computeDestination...");
+            logger.debug("Entering computeDestination...");
         }
 
         StringBuffer topic = new StringBuffer();
@@ -54,7 +54,10 @@ public class DestinationResolver implements Serializable {
         try {
             result = new StreamResult(new ByteArrayOutputStream());
             transformer.transform(source, result);
+
+            // Remove all empty spaces in the topic name
             topic.append(result.getOutputStream().toString().replaceAll("\\s+", ""));
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Destination: " + topic.toString());
             }

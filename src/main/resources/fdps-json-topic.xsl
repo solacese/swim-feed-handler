@@ -6,8 +6,8 @@
         <xsl:value-of select="flight/flightPlan/@identifier"/><xsl:text>/</xsl:text>
         <xsl:value-of select="flight/flightStatus/@fdpsFlightStatus"/><xsl:text>/</xsl:text>
         <xsl:value-of select="flight/flightIdentification/@aircraftIdentification"/><xsl:text>/</xsl:text>
-        <xsl:value-of select="flight/departure/@departurePoint"/><xsl:text>/</xsl:text>
-        <xsl:value-of select="flight/arrival/@arrivalPoint"/><xsl:text>/</xsl:text>
+        <xsl:value-of select="translate(flight/departure/@departurePoint,'/','')"/><xsl:text>/</xsl:text>
+        <xsl:value-of select="translate(flight/arrival/@arrivalPoint,'/','')"/><xsl:text>/</xsl:text>
         <xsl:value-of select="format-number(number(substring-before(flight/enRoute/position/position/location/pos,' ')),'000.0000;-000.0000')"/><xsl:text>/</xsl:text>
         <xsl:value-of select="format-number(number(substring-after(flight/enRoute/position/position/location/pos,' ')),'0000.0000;-000.0000')"/><xsl:text>/</xsl:text>
         <xsl:value-of select="format-number(number(flight/enRoute/position/actualSpeed/surveillance),'000')"/><xsl:text>/</xsl:text>

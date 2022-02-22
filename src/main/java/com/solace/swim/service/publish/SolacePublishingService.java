@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -66,21 +66,39 @@ public class SolacePublishingService implements IService {
     // New Solace Java API messaging service
     private MessagingService messagingService;
 
-    private JCSMPProperties jcsmpProperties;
-    private JCSMPSession jcsmpSession;
-    private XMLMessageProducer producer;
+    // New Solace Java API messaging publisher
+    private PersistentMessagePublisher messagePublisher;
 
     @PostConstruct
-    private void init() throws Exception {
+    private void init() {
         Properties props = new Properties();
         props.putAll(envProducer);
-        jcsmpProperties = JCSMPProperties.fromProperties(props);
-        jcsmpSession = JCSMPFactory.onlyInstance().createSession(jcsmpProperties);
-        producer = jcsmpSession.getMessageProducer(new JCSMPStreamingPublishEventHandler() {
-            @Override
-            public void handleError(String s, JCSMPException e, long l) {
-                logger.error(s,e);
-            }
+        props.setProperty(SolaceProperties.TransportLayerProperties.RECONNECTION_ATTEMPTS, "-1");
+        props.setProperty(SolaceProperties.TransportLayerProperties.CONNECTION_RETRIES, "-1");
+
+        messagingService = MessagingService.builder(ConfigurationProfile.V1).fromProperties(props).build();
+        messagingService.connect();
+
+        messagingService.addServiceInterruptionListener(serviceEvent -> {
+            logger.error("### SERVICE INTERRUPTION: "+serviceEvent.getCause());
+        });
+        messagingService.addReconnectionAttemptListener(serviceEvent -> {
+            logger.info("### RECONNECTING ATTEMPT: "+serviceEvent);
+        });
+        messagingService.addReconnectionListener(serviceEvent -> {
+            logger.info("### RECONNECTED: "+serviceEvent);
+        });
+
+        messagePublisher = messagingService.createPersistentMessagePublisherBuilder()
+                .build()
+                .start();
+
+        final PersistentMessagePublisher.MessagePublishReceiptListener deliveryConfirmationListener = (publishReceipt) -> {
+            // process delivery confirmation for some message ...
+        };
+
+        messagePublisher.setMessagePublishReceiptListener(deliveryConfirmationListener);
+    }
 
     @Override
     public void invoke(Message<?> message) {

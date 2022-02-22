@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.solace.swim</groupId>
 	<artifactId>swim-feed-handler-json</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<name>swim-feed-handler-json</name>
 	<description>SWIM Feed Handler Spring Boot Application</description>
 
@@ -30,6 +30,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-file</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.solace.spring.boot</groupId>
@@ -63,7 +75,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>10.5</version>
+			<version>10.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -72,7 +84,7 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>3.9.2</version>
+			<version>3.9.9</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.json</groupId>
@@ -82,7 +94,7 @@
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<version>2.5.0</version>
+			<version>2.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>

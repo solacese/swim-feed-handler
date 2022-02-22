@@ -3,34 +3,14 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans"
              xmlns:context="http://www.springframework.org/schema/context"
-             xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
-             xmlns:int-file="http://www.springframework.org/schema/integration/file"
-
-        xsi:schemaLocation="http://www.springframework.org/schema/beans
-		https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context
-		https://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/integration
-		https://www.springframework.org/schema/integration/spring-integration.xsd
-        http://www.springframework.org/schema/integration/xml
-        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
-        http://www.springframework.org/schema/integration/file
-        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                    https://www.springframework.org/schema/beans/spring-beans.xsd
+                                    http://www.springframework.org/schema/context
+                                    https://www.springframework.org/schema/context/spring-context.xsd
+                                    http://www.springframework.org/schema/integration
+                                    https://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <context:annotation-config />
-
-    <beans:bean id="envProducer" class="java.util.Hashtable">
-        <beans:constructor-arg>
-            <beans:map key-type="java.lang.Object" value-type="java.lang.String" >
-                <beans:entry key="solace.messaging.transport.host" value="${service.solace-publishing.host}"/>
-                <beans:entry key="solace.messaging.service.vpn-name" value="${service.solace-publishing.msg-vpn}"/>
-                <beans:entry key="solace.messaging.authentication.basic.username" value="${service.solace-publishing.client-username}"/>
-                <beans:entry key="solace.messaging.authentication.basic.password" value="#{environment['service.solace-publishing.client-password']}"/>
-                <beans:entry key="solace.messaging.service.publishers.persistent.ack-window-size" value="255"/>
-            </beans:map>
-        </beans:constructor-arg>
-
-    </beans:bean>
 
     <beans:bean id="envConsumer" class="java.util.Hashtable">
         <beans:constructor-arg>

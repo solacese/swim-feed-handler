@@ -2,37 +2,17 @@
 <beans:beans xmlns:int="http://www.springframework.org/schema/integration"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:context="http://www.springframework.org/schema/context"
              xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
-             xmlns:int-file="http://www.springframework.org/schema/integration/file"
              xsi:schemaLocation="http://www.springframework.org/schema/beans
-		https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context
-		https://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/integration
-		https://www.springframework.org/schema/integration/spring-integration.xsd
-        http://www.springframework.org/schema/integration/xml
-        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
-        http://www.springframework.org/schema/integration/file
-        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+                                    https://www.springframework.org/schema/beans/spring-beans.xsd
+                                    http://www.springframework.org/schema/integration
+                                    https://www.springframework.org/schema/integration/spring-integration.xsd
+                                    http://www.springframework.org/schema/integration/xml
+                                    https://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd">
 
     <beans:bean id="fdpsDestinationResolver" class="com.solace.swim.util.DestinationResolver">
         <beans:constructor-arg type="String" value="fdps-json-topic.xsl"/>
     </beans:bean>
-
-    <int-xml:xpath-expression id="fdpsTopic" expression="concat('FDPS/position/',
-                                                                message/flight/flightPlan/@identifier,'/',
-                                                                message/flight/flightStatus/@fdpsFlightStatus,'/',
-                                                                message/flight/flightIdentification/@aircraftIdentification,'/',
-                                                                substring-before(message/flight/enRoute/position/position/location/pos,' '),'/',
-                                                                substring-after(message/flight/enRoute/position/position/location/pos,' '),'/',
-                                                                message/flight/enRoute/position/actualSpeed/surveillance,'/',
-                                                                message/flight/enRoute/position/altitude,'/',
-                                                                message/flight/enRoute/position/trackVelocity/x,'/',
-                                                                message/flight/enRoute/position/trackVelocity/y
-                                                        )"
-                              ns-prefix="ns5"
-                              ns-uri="http://www.faa.aero/nas/3.0" />
 
     <int:filter id="fdpsMsgFilter" input-channel="msg.scds.service" output-channel="msg.scds.service.fdps.position" expression="headers.containsKey('FDPS_MessageType')?headers.get('FDPS_MessageType').contains('TH_FIXM'):'false'" discard-channel="dlq-logging" />
 

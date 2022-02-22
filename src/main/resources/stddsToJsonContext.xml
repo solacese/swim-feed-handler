@@ -2,24 +2,17 @@
 <beans:beans xmlns:int="http://www.springframework.org/schema/integration"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:beans="http://www.springframework.org/schema/beans"
-             xmlns:context="http://www.springframework.org/schema/context"
              xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
-             xmlns:int-file="http://www.springframework.org/schema/integration/file"
              xmlns:cache="http://www.springframework.org/schema/cache"
              xsi:schemaLocation="http://www.springframework.org/schema/beans
-		https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context
-		https://www.springframework.org/schema/context/spring-context.xsd
-		http://www.springframework.org/schema/integration
-		https://www.springframework.org/schema/integration/spring-integration.xsd
-        http://www.springframework.org/schema/integration/xml
-        http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
-        http://www.springframework.org/schema/integration/file
-        https://www.springframework.org/schema/integration/file/spring-integration-file.xsd
-        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
-        http://www.springframework.org/schema/cache
-        http://www.springframework.org/schema/cache/spring–cache.xsd"
-    >
+                                    https://www.springframework.org/schema/beans/spring-beans.xsd
+                                    http://www.springframework.org/schema/integration
+                                    https://www.springframework.org/schema/integration/spring-integration.xsd
+                                    http://www.springframework.org/schema/integration/xml
+                                    https://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd
+                                    http://www.springframework.org/schema/cache
+                                    https://www.springframework.org/schema/cache/spring-cache.xsd"
+>
     <cache:annotation-driven />
 
 
@@ -28,7 +21,7 @@
     </int:header-value-router>-->
     <int:filter id="stddsMsgFilter" input-channel="msg.scds.service" output-channel="msg.scds.service.stdds.smes" expression="headers.containsKey('msgType')?headers.get('msgType').contains('AT'):'false'" discard-channel="dlq-logging"/>
 
-    <int-xml:xpath-router id="smesPositionReport" input-channel="msg.scds.service.stdds.smes"  evaluate-as-string="true" >
+    <int-xml:xpath-router id="smesPositionReport" input-channel="msg.scds.service.stdds.smes" evaluate-as-string="true" >
         <int-xml:xpath-expression expression="boolean(ns2:asdexMsg/positionReport)"
                                   ns-prefix="ns2"
                                   ns-uri="urn:us:gov:dot:faa:atm:terminal:entities:v4-0:smes:surfacemovementevent"
