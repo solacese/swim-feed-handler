@@ -119,8 +119,8 @@ The following is a list of services that have been provided.
 * [Solace Publishing Service](#121-solace-publishing-service)
 * [File Output Service](#122-file-output-service)
 * [Message Logging Service](#123-message-logging-service)
-* [AWS S3 Put Service](#124-aws-s3-put-service)
-* [Null Op Service](#125-null-op-service)
+* [AWS S3 Put Service](#124-aws-s3-put-service)  *Deprecated as of R1.4.0.  See notes below*
+* [Null Op Service](#125-null-op-service)  
 
 New services can be created as needed.  Refer to the [Spring Integration Project](https://docs.spring.io/spring-integration/docs/5.2.6.RELEASE/reference/html/)
 for reference documentation on `@Service`, `@ServiceActivator` and `@MessageEndpoint` annotations.
@@ -193,6 +193,12 @@ service.message-logging.header-remove-list=jms*,*JMS*,solace*,Solace*,breadcrumb
 ```
 
 ##### 1.2.4 AWS S3 Put Service
+*Deprecated since R1.4.0*
+
+*It is recommended to use Solace integration capabilities with Cloud Native Services. Use the SolacePublishingService to  
+publish to a Solace broker and then use Solace's REST Delivery Points to connect to the AWS S3 service.*
+https://solace.com/blog/simplifying-integration-cloud-services-data-lakes-rest-delivery-points/
+
 A simple service to put the contents of the message as a String object into an AWS Simple Storage Service (S3) bucket.
 The service requires AWS Security Credentials w/ recommendation of AmazonS3FullAccess permissions.  
 

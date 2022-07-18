@@ -32,6 +32,7 @@ import org.springframework.scheduling.annotation.Async;
  * Service Activator pattern.  The input is the internal message channel msg.scds.service.
  * Invokes the AWSS3PutService.
  */
+@Deprecated
 @MessageEndpoint
 @ConditionalOnProperty(prefix = "service.aws-s3-put", value = "enabled", havingValue = "true")
 public class AWSS3PutServiceActivator implements IServiceActivator {

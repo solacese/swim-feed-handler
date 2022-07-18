@@ -46,6 +46,7 @@ import java.io.InputStream;
  *
  * This service is only enabled when the property service.aws-s3-put.enabled=true.
  */
+@Deprecated
 @Service
 @ConditionalOnProperty(prefix = "service.aws-s3-put", value = "enabled", havingValue = "true")
 public class AWSS3PutService implements IService {
