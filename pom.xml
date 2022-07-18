@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.solace.swim</groupId>
 	<artifactId>swim-feed-handler-json</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<name>swim-feed-handler-json</name>
 	<description>SWIM Feed Handler Spring Boot Application</description>
 
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.12.135</version>
+			<version>1.12.262</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>
