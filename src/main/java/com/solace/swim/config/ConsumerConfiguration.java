@@ -1,4 +1,5 @@
-/**
+package com.solace.swim.config;
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,8 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.solace.swim.config;
 
+
+import jakarta.jms.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +32,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
 import javax.annotation.PostConstruct;
-import javax.jms.ConnectionFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
 
 /**
@@ -52,7 +53,7 @@ public class ConsumerConfiguration {
     // The values are defined in the application.properties files so there is no need to modify
     // the values in application.context
     @Autowired
-    Hashtable envConsumer;
+    Hashtable<Object,String> envConsumer;
 
     @Value("${solace.jms.consumer.connection-factory}")
     private String consumerConnectionFactoryName;
@@ -63,7 +64,6 @@ public class ConsumerConfiguration {
 
     /**
      * Initialize the InitialConext based on the environment properties that is autowired via Spring.
-     * @throws NamingException
      */
     @PostConstruct
     public void init() throws NamingException {
@@ -74,7 +74,6 @@ public class ConsumerConfiguration {
      * Generate a custom JMS Listener Connection Factory.
      * @param errorHandler - simple error handler
      * @return DefaultJmsListenerContainerFactory
-     * @throws Exception
      */
     @Bean
     public DefaultJmsListenerContainerFactory cFactory(SwimErrorHandler errorHandler) throws Exception {
@@ -96,12 +95,9 @@ public class ConsumerConfiguration {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(os);
             t.printStackTrace(ps);
-            try {
-                String output = os.toString("UTF8");
-                logger.error("============= Error processing message: " + t.getMessage()+"\n"+output);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("An error occurred." + t.getMessage());
-            }
+            String output = os.toString(StandardCharsets.UTF_8);
+            logger.error("============= Error processing message: " + t.getMessage()+"\n"+output);
+
 
         }
     }

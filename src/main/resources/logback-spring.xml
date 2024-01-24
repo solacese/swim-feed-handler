@@ -19,7 +19,7 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d %p %c{1.} [%t] %msg%n</pattern>
+            <pattern>%d %p %c{1}. [%t] %msg%n</pattern>
         </encoder>
     </appender>
 
