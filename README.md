@@ -28,8 +28,7 @@ factory and queue names.  The application provides a set of services to handle t
 once consumed.  
 
 Other services included are a FileOutputService, which writes consumed messages to
-the file system, and an AWS Simple Storage Service (S3), which writes the payload of the 
-consumed messages to S3 as a string, a Message Logging service that writes messages to a single
+the file system, a Message Logging service that writes messages to a single
 message log while rotating every hour and a NullOp service that discards the message upon receipt.
   
 ![SWIM Feed Handler](images/sfh.png)
@@ -199,13 +198,6 @@ service.message-logging.header-remove-list=jms*,*JMS*,solace*,Solace*,breadcrumb
 publish to a Solace broker and then use Solace's REST Delivery Points to connect to the AWS S3 service.*
 https://solace.com/blog/simplifying-integration-cloud-services-data-lakes-rest-delivery-points/
 
-A simple service to put the contents of the message as a String object into an AWS Simple Storage Service (S3) bucket.
-The service requires AWS Security Credentials w/ recommendation of AmazonS3FullAccess permissions.  
-
-Identify the targeted bucket via the property `service.aws-s3-put.bucket-name`.
-
-An optional parameter `service.aws-s3-put.folder-name` can be used to create folders under the bucket.  Multiple
-levels of folders can be defined.  Each folder sub-level should be separated by a `/` character.
 
 ##### 1.2.5 Null Op Service
 This service simply discards the messages upon receipt.  The idea of this service is to provide a mechanism to test
