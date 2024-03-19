@@ -163,7 +163,16 @@ public class SolacePublishingService implements IService {
 
             properties = null;
             logger.info("Published message id {} to topic {}.", message.getHeaders().get("jms_messageId"), topic.getName());
-        } catch (Exception ex) {
+        } catch (IllegalStateException ex) {
+            logger.error("Error in state of publisher. Trying to recover...");
+            if (!messagePublisher.isTerminated()) {
+                messagePublisher.terminate(100);
+            }
+            messagingService.disconnect();
+            init();
+            invoke(message);
+        }
+        catch (Exception ex) {
             logger.error("Unable to send message", ex);
         }
     }
