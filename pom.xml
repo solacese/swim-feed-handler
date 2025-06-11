@@ -5,17 +5,19 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.2</version>
+		<version>3.3.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.solace.swim</groupId>
 	<artifactId>swim-feed-handler-json</artifactId>
-	<version>1.2.1</version>
+	<version>1.4.0</version>
 	<name>swim-feed-handler-json</name>
 	<description>SWIM Feed Handler Spring Boot Application</description>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -46,36 +48,35 @@
 		<dependency>
 			<groupId>com.solace.spring.boot</groupId>
 			<artifactId>solace-jms-spring-boot-starter</artifactId>
-			<version>4.1.1</version>
+			<version>5.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.solace</groupId>
 			<artifactId>solace-messaging-client</artifactId>
-			<version>1.0.0</version>
+			<version>1.8.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.solacesystems</groupId>
 			<artifactId>sol-jms</artifactId>
-			<version>10.11.0</version>
+			<version>10.27.2</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.cache</groupId>
 			<artifactId>cache-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.12.262</version>
-		</dependency>
-		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>
 			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>3.0.4</version>
+			<version>3.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>10.6</version>
+			<version>12.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -84,7 +85,8 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>3.9.9</version>
+			<version>3.10.8</version>
+			<classifier>jakarta</classifier>
 		</dependency>
 		<dependency>
 			<groupId>javax.json</groupId>

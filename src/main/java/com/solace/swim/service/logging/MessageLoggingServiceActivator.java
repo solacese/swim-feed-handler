@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.Message;
 import org.springframework.scheduling.annotation.Async;
 
@@ -73,8 +72,8 @@ public class MessageLoggingServiceActivator implements IServiceActivator {
     @Bean
     public IntegrationFlow filterHeaders() {
         if (logger.isDebugEnabled()) logger.debug("Headers to Remove: {}", headersToRemove);
-        return IntegrationFlows.from("msg.scds.service")
-                .headerFilter(headersToRemove,true)
+        return IntegrationFlow.from("msg.scds.service")
+                .headerFilter(headersToRemove)
                 .enrichHeaders(Collections.singletonMap("capture-timestamp", dateFormatter.format(Instant.now())))
                 .channel("msg.scds.service.log-message")
                 .get();

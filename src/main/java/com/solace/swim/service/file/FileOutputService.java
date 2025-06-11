@@ -21,6 +21,7 @@ package com.solace.swim.service.file;
 import com.solace.swim.service.IService;
 import com.solace.swim.util.MessageUtil;
 import com.solacesystems.jms.message.SolMessage;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,13 +29,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
 /**
  * Service class designed to write data to disk.  The payload of the message will be written as a file.

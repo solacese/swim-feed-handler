@@ -18,6 +18,8 @@
  */
 package com.solace.swim.config;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.jms.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +31,6 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
-import javax.annotation.PostConstruct;
-import javax.jms.ConnectionFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;

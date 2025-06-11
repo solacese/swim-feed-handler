@@ -11,8 +11,6 @@
         <xsl:value-of select="format-number(number(substring-before(flight/enRoute/position/position/location/pos,' ')),'000.0000;-000.0000')"/><xsl:text>/</xsl:text>
         <xsl:value-of select="format-number(number(substring-after(flight/enRoute/position/position/location/pos,' ')),'0000.0000;-000.0000')"/><xsl:text>/</xsl:text>
         <xsl:value-of select="format-number(number(flight/enRoute/position/actualSpeed/surveillance),'000')"/><xsl:text>/</xsl:text>
-        <xsl:value-of select="format-number(number(flight/enRoute/position/altitude),'00000')"/><xsl:text>/</xsl:text>
-        <xsl:value-of select="format-number(number(flight/enRoute/position/trackVelocity/x),'0000;-000')"/><xsl:text>/</xsl:text>
-        <xsl:value-of select="format-number(number(flight/enRoute/position/trackVelocity/y),'0000;-000')"/>
+        <xsl:value-of select="format-number(number(flight/enRoute/position/altitude),'00000')"/>
     </xsl:template>
 </xsl:stylesheet>
