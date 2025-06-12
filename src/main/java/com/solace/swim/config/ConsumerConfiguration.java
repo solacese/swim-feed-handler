@@ -31,7 +31,7 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;

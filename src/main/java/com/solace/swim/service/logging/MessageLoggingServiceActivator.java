@@ -73,7 +73,7 @@ public class MessageLoggingServiceActivator implements IServiceActivator {
     public IntegrationFlow filterHeaders() {
         if (logger.isDebugEnabled()) logger.debug("Headers to Remove: {}", headersToRemove);
         return IntegrationFlow.from("msg.scds.service")
-                .headerFilter(headersToRemove,true)
+                .headerFilter(headersToRemove)
                 .enrichHeaders(Collections.singletonMap("capture-timestamp", dateFormatter.format(Instant.now())))
                 .channel("msg.scds.service.log-message")
                 .get();

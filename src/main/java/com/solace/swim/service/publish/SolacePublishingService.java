@@ -38,8 +38,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import javax.jms.JMSException;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
